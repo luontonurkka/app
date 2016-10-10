@@ -5,10 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="fi.jyu.ln.luontonurkka.SpeciesView"
+    tools:context="fi.jyu.ln.luontonurkka.SpeciesActivity"
     tools:showIn="@layout/activity_species_view">
 
     <TextView
+        android:id="species_content_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
