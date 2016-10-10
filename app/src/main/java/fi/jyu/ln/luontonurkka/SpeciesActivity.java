@@ -7,8 +7,13 @@ import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 
 import static fi.jyu.ln.luontonurkka.R.id.species_content_text;
-import static fi.jyu.ln.luontonurkka.R.id.toolbar_layout;
+import static fi.jyu.ln.luontonurkka.R.id.species_toolbar_layout;
 
+/**
+ * Activity that display species specific info
+ *
+ * Created by Jarno on 10.10.2016.
+ */
 public class SpeciesActivity extends AppCompatActivity {
 
     Species species;
@@ -20,11 +25,14 @@ public class SpeciesActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // get species from intent
         species = (Species)getIntent().getSerializableExtra("Species");
 
-        CollapsingToolbarLayout layout = (CollapsingToolbarLayout)this.findViewById(toolbar_layout);
+        // set title to species name
+        CollapsingToolbarLayout layout = (CollapsingToolbarLayout)this.findViewById(species_toolbar_layout);
         layout.setTitle(species.getName());
 
+        // get text from desc
         TextView contentTextView = (TextView)this.findViewById(species_content_text);
         contentTextView.setText(species.getDescr());
     }
