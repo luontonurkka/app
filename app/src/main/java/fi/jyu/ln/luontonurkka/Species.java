@@ -11,6 +11,10 @@ import java.io.Serializable;
 public class Species implements Serializable {
 
     private final String name;      //required
+    /*
+    1 = bird
+    2 = plant
+     */
     private final int type;         //required
     private final String descr;     //optional
 
