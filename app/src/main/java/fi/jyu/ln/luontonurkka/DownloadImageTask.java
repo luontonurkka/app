@@ -13,7 +13,7 @@ import java.net.URL;
  * Created by jarno on 10/11/16.
  */
 
-public class Tools {
+public static class Tools {
 
     /**
      * Class that loads and image from url and sets it in the ImageView provided.
