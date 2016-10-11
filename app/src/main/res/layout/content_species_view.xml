@@ -12,7 +12,7 @@
         android:id="@+id/species_content_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="50px"
+        android:layout_margin="@dimen/text_margin"
         android:text="@string/species_desc" />
 
 </android.support.v4.widget.NestedScrollView>
