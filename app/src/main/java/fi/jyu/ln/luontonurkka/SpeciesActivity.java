@@ -1,5 +1,6 @@
 package fi.jyu.ln.luontonurkka;
 
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -38,6 +39,8 @@ public class SpeciesActivity extends AppCompatActivity {
         // set title to species name
         CollapsingToolbarLayout layout = (CollapsingToolbarLayout)this.findViewById(species_toolbar_layout);
         layout.setTitle(species.getName());
+        layout.setExpandedTitleColor(Color.WHITE);
+        layout.setCollapsedTitleTextColor(Color.WHITE);
 
         // get text from desc
         TextView contentTextView = (TextView)this.findViewById(species_content_text);
