@@ -8,15 +8,17 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 /**
+ * Loads text from url and calls onTaskComplete when text is loaded.
  *
+ * Usage: new DownloadImageTask(onTaskComplete).execute("http://url.com/img.png");
  *
  * Created by Jarno on 11.10.16.
  */
 public class DownloadTextTask extends AsyncTask<String, Void, String> {
 
-    private OnTextTaskCompleted taskCompleted;
+    private OnTaskCompleted taskCompleted;
 
-    public DownloadTextTask(OnTextTaskCompleted taskCompleted) {
+    public DownloadTextTask(OnTaskCompleted taskCompleted) {
         this.taskCompleted = taskCompleted;
     }
 

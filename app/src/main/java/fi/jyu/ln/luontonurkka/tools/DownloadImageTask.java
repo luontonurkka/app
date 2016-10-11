@@ -4,27 +4,24 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ImageView;
 
 import java.io.InputStream;
 import java.net.URL;
 
 /**
- * Created by jarno on 10/11/16.
- */
-
-/**
- * Class that loads and image from url and sets it in the ImageView provided.
+ * Loads image and calls onTaskComplete when image is loaded.
  *
  * Usage:
- * new DownloadImageTask(imageView).execute("http://url.com/img.png");
+ * new DownloadImageTask(onTaskComplete).execute("http://url.com/img.png");
+ *
+ * Created by jarno on 11.10.16.
  */
 public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
-    private ImageView imgView;
+    private OnTaskCompleted taskCompleted;
 
-    public DownloadImageTask(ImageView imgView) {
-        this.imgView = imgView;
+    public DownloadImageTask(OnTaskCompleted taskCompleted) {
+        this.taskCompleted = taskCompleted;
     }
 
     protected Bitmap doInBackground(String... urls) {
@@ -42,6 +39,6 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
 
     protected void onPostExecute(Bitmap result) {
-        imgView.setImageBitmap(result);
+        taskCompleted.onTaskCompleted(result);
     }
 }
