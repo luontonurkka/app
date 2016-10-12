@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Luontonurkka</string>
+    <string name="no_location_detected">No location detected!</string>
 </resources>
