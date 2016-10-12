@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -22,7 +23,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Iterator;
 
-import fi.jyu.ln.luontonurkka.tools.DownloadImageTask;
 import fi.jyu.ln.luontonurkka.tools.DownloadTextTask;
 import fi.jyu.ln.luontonurkka.tools.OnTaskCompleted;
 
@@ -103,5 +103,24 @@ public class SpeciesActivity extends AppCompatActivity {
     protected void openWikiPage(String pageId) {
         Intent wikiIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://fi.wikipedia.org/?curid=" + pageId));
         startActivity(wikiIntent);
+
+        // get text from desc
+        TextView contentTextView = (TextView)this.findViewById(species_content_text);
+        contentTextView.setText(species.getDescr());
+
+        // get img
+        ImageView imgView = (ImageView)this.findViewById(species_toolbar_img);
+        imgView.setImageResource(R.drawable.kissa);
+    }
+
+    private static Drawable LoadImageFromUrl(String url) {
+        try {
+            InputStream is = (InputStream)new URL(url).getContent();
+            Drawable d = Drawable.createFromStream(is, "img");
+            return d;
+        } catch(Exception e) {
+            Log.w("SpeciesAcitivty", "Image " + url + " load failed");
+            return null;
+        }
     }
 }
