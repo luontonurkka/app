@@ -23,7 +23,7 @@
 
         <Button
             android:layout_margin="@dimen/text_margin"
-            android:text="Lue lisää wikistä"
+            android:text="@string/read_more_wiki"
             android:visibility="invisible"
             android:id="@+id/species_content_button_wiki"
             android:layout_width="match_parent"
