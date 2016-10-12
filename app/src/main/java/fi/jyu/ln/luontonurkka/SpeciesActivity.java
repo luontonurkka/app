@@ -1,13 +1,17 @@
 package fi.jyu.ln.luontonurkka;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -34,6 +38,8 @@ import static fi.jyu.ln.luontonurkka.R.id.species_toolbar_layout;
 public class SpeciesActivity extends AppCompatActivity {
 
     Species species;
+
+    private static final int DESCRIPTION_LENGTH = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,10 +70,22 @@ public class SpeciesActivity extends AppCompatActivity {
                 try {
                     final JSONObject obj = new JSONObject(result);
                     Iterator<String> keys = obj.getJSONObject("query").getJSONObject("pages").keys();
-                    String firstKey = "";
                     if (keys.hasNext()) {
-                        firstKey = (String)keys.next();
-                        contentTextView.setText(obj.getJSONObject("query").getJSONObject("pages").getJSONObject(firstKey).getString("extract"));
+                        final String firstKey = (String)keys.next();
+                        String desc = obj.getJSONObject("query").getJSONObject("pages").getJSONObject(firstKey).getString("extract");
+                        if(desc.length() > DESCRIPTION_LENGTH) {
+                            desc = desc.substring(0,DESCRIPTION_LENGTH) + "...";
+                        }
+                        contentTextView.setText(desc);
+                        Button wikiButton = (Button)findViewById(R.id.species_content_button_wiki);
+                        wikiButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                openWikiPage(firstKey);
+                            }
+                        });
+                        wikiButton.setVisibility(View.VISIBLE);
+
                     }
                 } catch (JSONException je) {
                     Log.w(getClass().toString(), je.getMessage());
@@ -80,5 +98,10 @@ public class SpeciesActivity extends AppCompatActivity {
             }
         };
         new DownloadTextTask(task).execute("https://fi.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=" + species.getName());
+    }
+
+    protected void openWikiPage(String pageId) {
+        Intent wikiIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://fi.wikipedia.org/?curid=" + pageId));
+        startActivity(wikiIntent);
     }
 }

@@ -8,11 +8,27 @@
     tools:context="fi.jyu.ln.luontonurkka.SpeciesActivity"
     tools:showIn="@layout/activity_species_view">
 
-    <TextView
-        android:id="@+id/species_content_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:text="@string/species_desc" />
+    <LinearLayout
+        android:id="@+id/species_content_linear_layout"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/species_content_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:text="@string/species_desc" />
+
+        <Button
+            android:layout_margin="@dimen/text_margin"
+            android:text="Lue lisää wikistä"
+            android:visibility="invisible"
+            android:id="@+id/species_content_button_wiki"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
 
 </android.support.v4.widget.NestedScrollView>
