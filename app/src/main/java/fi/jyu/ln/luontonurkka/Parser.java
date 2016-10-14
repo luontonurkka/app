@@ -17,12 +17,12 @@ public abstract class Parser {
 
     protected abstract HashMap parseFile() throws IOException;
 
-    private BufferedReader openFile(InputStream is) throws FileNotFoundException {
+    protected BufferedReader openFile(InputStream is) throws FileNotFoundException {
         buffer = new BufferedReader(new InputStreamReader(is));
         return buffer;
     }
 
-    private void closeFile() throws IOException {
+    protected void closeFile() throws IOException {
         if (buffer != null) {
             buffer.close();
         }

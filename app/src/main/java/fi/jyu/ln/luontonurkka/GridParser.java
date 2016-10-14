@@ -20,7 +20,7 @@ public class GridParser extends Parser {
      */
     @Override
     protected HashMap parseFile() throws IOException {
-        HashMap<int[], ArrayList<String>> grid = new HashMap<>();
+        HashMap<ArrayList<Integer>, ArrayList<String>> grid = new HashMap<>();
         String csvLine;
         while ((csvLine = buffer.readLine()) != null) {
             String[] splitLine = csvLine.split("\\s*,\\s*");
@@ -28,7 +28,9 @@ public class GridParser extends Parser {
             String[] coordsAsString = splitLine[0].split(":");
             int n = Integer.parseInt(coordsAsString[0]);
             int e = Integer.parseInt(coordsAsString[1]);
-            int[] coords = {n, e};
+            ArrayList<Integer> coords = new ArrayList<Integer>();
+            coords.add(n);
+            coords.add(e);
 
             ArrayList<String> allSpeciesInSquare = new ArrayList<String>();
             if (splitLine.length > 1) {
