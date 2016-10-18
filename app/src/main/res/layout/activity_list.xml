@@ -4,7 +4,7 @@
     android:id="@+id/activity_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="fi.jyu.ln.luontonurkka.ListActivity">
+    tools:context="fi.jyu.ln.luontonurkka.TabbedListActivity">
 
     <ListView
         android:id="@+id/species_list"
