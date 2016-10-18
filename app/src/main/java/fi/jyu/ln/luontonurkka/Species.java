@@ -1,13 +1,20 @@
 package fi.jyu.ln.luontonurkka;
 
+import java.io.Serializable;
+
 /**
  * A class representing a species, using builder design pattern.
  * Created by sinikka on 7.10.2016.
+ * Edited by Jarno on 10.10.2016.
  */
 
-public class Species {
+public class Species implements Serializable {
 
     private final String name;      //required
+    /*
+    1 = bird
+    2 = plant
+     */
     private final int type;         //required
     private final String descr;     //optional
 
@@ -28,6 +35,8 @@ public class Species {
     public String toString() {
         return name;
     }
+
+    public String getDescr() { return descr; }
 
     public static class SpeciesBuilder {
         private final String name;      //required
