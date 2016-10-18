@@ -1,6 +1,7 @@
 package fi.jyu.ln.luontonurkka;
 
 import android.app.ActionBar;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -52,11 +53,8 @@ public class TabbedListActivity extends AppCompatActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = (ViewPager) findViewById(R.id.list_pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-
-        final ActionBar actionBar = getActionBar();
-
     }
 
 
@@ -211,5 +209,22 @@ public class TabbedListActivity extends AppCompatActivity {
         intent.putExtra("Species", species);
 
         startActivity(intent);
+    }
+
+    public void showAllTab(View view) {
+        showTab(0);
+    }
+
+    public void showBirdsTab(View view) {
+        showTab(1);
+    }
+
+    public void showPlantsTab(View view) {
+        showTab(2);
+    }
+
+    public void showTab(int index) {
+        ViewPager pager = (ViewPager)findViewById(R.id.list_pager);
+        pager.setCurrentItem(index);
     }
 }

@@ -7,5 +7,9 @@
     <string name="action_settings">Settings</string>
     <string name="read_more_wiki">Lue lisää wikipediasta</string>
     <string name="title_activity_tabbed">TabbedActivity</string>
+
+    <string name="tab_all">Kaikki</string>
+    <string name="tab_birds">Linnut</string>
+    <string name="tab_plants">Kasvit</string>
     <string name="title_activity_maps">Map</string>
 </resources>
