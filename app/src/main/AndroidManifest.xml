@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".TabbedActivity"
+            android:name=".TabbedListActivity"
             android:label="@string/title_activity_tabbed"
             android:theme="@style/AppTheme.NoActionBar"><intent-filter>
             <action android:name="android.intent.action.MAIN" />
