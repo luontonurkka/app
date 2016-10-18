@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="fi.jyu.ln.luontonurkka.TabbedActivity">
+    tools:context="fi.jyu.ln.luontonurkka.TabbedListActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
@@ -15,15 +15,10 @@
         android:paddingTop="@dimen/appbar_padding_top"
         android:theme="@style/AppTheme.AppBarOverlay">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        <TextView
+            android:text="tabit"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/AppTheme.PopupOverlay">
-
-        </android.support.v7.widget.Toolbar>
+            android:layout_height="match_parent" />
 
     </android.support.design.widget.AppBarLayout>
 
