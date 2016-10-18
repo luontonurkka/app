@@ -1,5 +1,7 @@
 package fi.jyu.ln.luontonurkka;
 
+import android.content.Context;
+import android.util.AttributeSet;
 import android.view.View;
 
 /**
@@ -7,4 +9,9 @@ import android.view.View;
  */
 
 public class SpeciesListObject extends View {
+    public SpeciesListObject(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
+
+        inflate(context, R.layout.specieslistobject_layout, null);
+    }
 }
