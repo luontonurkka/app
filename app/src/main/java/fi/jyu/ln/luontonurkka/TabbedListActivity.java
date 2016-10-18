@@ -23,7 +23,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class TabbedActivity extends AppCompatActivity {
+public class TabbedListActivity extends AppCompatActivity {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -144,7 +144,7 @@ public class TabbedActivity extends AppCompatActivity {
                 row.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ((TabbedActivity)v.getContext()).openSpeciesView(species);
+                        ((TabbedListActivity)v.getContext()).openSpeciesView(species);
                     }
                 });
                 return row;
