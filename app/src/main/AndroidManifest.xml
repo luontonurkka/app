@@ -16,9 +16,6 @@
             android:name=".TabbedListActivity"
             android:label="@string/title_activity_tabbed"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
         </activity>
         <activity android:name=".MapsActivity" />
         <activity android:name=".SpeciesActivity" />
@@ -34,6 +31,17 @@
             <intent-filter>
 
                 <action android:name="android.intent.action.MAIN" />
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            </intent-filter>
+        </activity>
+        <activity android:name=".SpeciesActivity" />
+        <activity
+            android:name=".Loading"
+            android:label="@string/title_activity_loading"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
