@@ -15,8 +15,15 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
 /**
- * Created by sinikka on 18.10.2016.
+ * LastKnownLocation creates an instance of GoogleApiClient, connects and
+ * disconnects the client and fetches the device's last known location. To use
+ * in Activity, create LastKnownLocation object in onCreate() with parameters
+ * this.getApplicationContext() and (Activity) this. Then, use connectAPI() in
+ * onStart() and disconnectAPI() in onStop().
  *
+ * TODO The above instructions need verifying.
+ *
+ * Created by Sinikka Siironen on 18.10.2016.
  */
 
 public class LastKnownLocation implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -31,7 +38,7 @@ public class LastKnownLocation implements GoogleApiClient.ConnectionCallbacks, G
 
     /**
      * Constructor
-     * @param context Context
+     * @param context Activity's context
      * @param activity Activity which creates LastKnownLocation instance
      */
     public LastKnownLocation(Context context, Activity activity) {
