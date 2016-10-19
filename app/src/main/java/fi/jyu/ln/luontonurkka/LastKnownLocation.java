@@ -15,7 +15,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
 /**
- * Created by sinikka on 18.10.2016.'
+ * Created by sinikka on 18.10.2016.
  *
  */
 
