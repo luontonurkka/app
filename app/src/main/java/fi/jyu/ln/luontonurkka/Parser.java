@@ -1,9 +1,10 @@
 package fi.jyu.ln.luontonurkka;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 
@@ -15,10 +16,10 @@ public abstract class Parser {
 
     protected static BufferedReader buffer = null;
 
-    protected abstract HashMap parseFile() throws IOException;
+    protected abstract HashMap<String, String> parseFile() throws IOException;
 
-    protected BufferedReader openFile(InputStream is) throws FileNotFoundException {
-        buffer = new BufferedReader(new InputStreamReader(is));
+    protected BufferedReader openFile(File f) throws FileNotFoundException {
+        buffer = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
         return buffer;
     }
 
