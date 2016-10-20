@@ -192,6 +192,13 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         startActivity(intent);
     }
 
+    public void showDrawer(View view) {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (!drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.openDrawer(GravityCompat.START);
+        }
+    }
+
     public void showAllTab(View view) {
         showTab(0);
     }

@@ -26,33 +26,45 @@
             android:paddingTop="@dimen/appbar_padding_top"
             android:theme="@style/AppTheme.AppBarOverlay">
 
-            <LinearLayout
-                android:layout_gravity="center_horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent">
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_three_lines"/>
-                <Button
-                    android:text="@string/tab_all"
-                    android:onClick="showAllTab"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageButton
+                    android:layout_marginTop="8dp"
+                    android:layout_marginLeft="@dimen/text_margin_half"
+                    android:padding="10dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_three_lines"
+                    android:onClick="showDrawer"
                     style="?android:attr/borderlessButtonStyle"/>
-                <Button
-                    android:text="@string/tab_birds"
-                    android:onClick="showBirdsTab"
+
+                <LinearLayout
+                    android:layout_centerHorizontal="true"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="?android:attr/borderlessButtonStyle"/>
-                <Button
-                    android:text="@string/tab_plants"
-                    android:onClick="showPlantsTab"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="?android:attr/borderlessButtonStyle"/>
-            </LinearLayout>
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:text="@string/tab_all"
+                        android:onClick="showAllTab"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="?android:attr/borderlessButtonStyle"/>
+                    <Button
+                        android:text="@string/tab_birds"
+                        android:onClick="showBirdsTab"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="?android:attr/borderlessButtonStyle"/>
+                    <Button
+                        android:text="@string/tab_plants"
+                        android:onClick="showPlantsTab"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="?android:attr/borderlessButtonStyle"/>
+                </LinearLayout>
+
+            </RelativeLayout>
 
         </android.support.design.widget.AppBarLayout>
 
