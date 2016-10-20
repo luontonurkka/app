@@ -1,11 +1,9 @@
-package fi.jyu.ln.luontonurkka;
+package fi.jyu.ln.luontonurkka.tools;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.security.AllPermission;
-import java.util.ArrayList;
 import java.util.HashMap;
+
+import fi.jyu.ln.luontonurkka.Species;
 
 /**
  * A parser to parse grid data from a CSV file.

@@ -37,3 +37,32 @@ OnTaskCompleted task = new OnTaskCompleted() {
 };
 new DownloadImageTask(task).execute(url)
 ```
+
+# Parsers
+
+Parses CSV files.
+
+## Code examples
+
+### GridParser
+```
+GridParser p = new GridParser();
+p.openFile(new File("example.csv");
+HashMap<String, String> grid = p.parseFile();
+p.closeFile();
+
+// To search a square based on coordinate, returns a string with
+// species separated by comma
+String speciesInSquare = grid.get("690:343");
+```
+
+### SpeciesParser
+```
+SpeciesParser p = new SpeciesParser();
+p.openFile(new File("example.csv");
+HashMap<String, Species> species = p.parseFile();
+p.closeFile();
+
+// To search a species based on name, returns a Species object
+Species teeri = species.get("Tetrao Tetrix");
+```
