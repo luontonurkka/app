@@ -61,7 +61,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
     }
 
     /**
-     * A placeholder fragment containing a simple view.
+     * Fragment creating species list
      */
     public static class ListFragment extends Fragment {
         /**
@@ -89,8 +89,8 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.activity_list, container, false);
-            //TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+
+            // get list of species from the arguments
             ArrayList<Species> speciesList = (ArrayList<Species>) getArguments().getSerializable(ARG_SPECIES_LIST);
 
             SpeciesListAdapter sla = new SpeciesListAdapter(container.getContext(), speciesList);
@@ -146,6 +146,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             // getItem is called to instantiate the fragment for the given page.
             // Return a ListFragment (defined as a static inner class below).
 
+            // TODO create lists in a method
             ArrayList<Species> testiLista = new ArrayList<Species>(10);
             for (int i = 0;i < 10; i++) {
                 if(i > 5) {
@@ -184,6 +185,10 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         }
     }
 
+    /**
+     * Opens the species view activity.
+     * @param species   Species object on which more info will be shown
+     */
     protected void openSpeciesView(Species species) {
 
         Intent intent = new Intent(this, SpeciesActivity.class);
@@ -192,6 +197,10 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         startActivity(intent);
     }
 
+    /**
+     * Shows settings drawer. Called from three vertical lines button.
+     * @param view  View that calling the method
+     */
     public void showDrawer(View view) {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (!drawer.isDrawerOpen(GravityCompat.START)) {
