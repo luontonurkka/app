@@ -1,4 +1,4 @@
-package fi.jyu.ln.luontonurkka;
+package fi.jyu.ln.luontonurkka.tools;
 
 import java.io.IOException;
 import java.util.HashMap;
