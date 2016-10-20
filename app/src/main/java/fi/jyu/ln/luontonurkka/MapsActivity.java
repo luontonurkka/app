@@ -1,10 +1,18 @@
 package fi.jyu.ln.luontonurkka;
 
+import android.*;
 import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.location.Location;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -12,9 +20,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback  {
 
     private GoogleMap mMap;
+
+    /* LastKnownLocation Constant Permission */
+    private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +36,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
-
 
     /**
      * Manipulates the map once available.
@@ -39,11 +49,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        // Add a marker device location
-//        LastKnownLocation lkl = new LastKnownLocation(getApplicationContext(), (Activity) this);
-//        LatLng loc = lkl.getLocation();
-//        mMap.addMarker(new MarkerOptions().position(loc).title("Marker in device location"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(loc));
+        LatLng loc = new LatLng(62.232436, 25.737582);
+        mMap.addMarker(new MarkerOptions().position(loc).title("Marker in device location"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(loc));
     }
 }
