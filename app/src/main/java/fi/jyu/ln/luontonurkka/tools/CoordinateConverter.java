@@ -29,8 +29,30 @@ public class CoordinateConverter {
         return result;
     }
 
-    public static void YKJToWGS(int p, int i) {
-
+    public static double[] YKJToWGS(int p, int i) {
+        double pp = (double)p;
+        double ii = (double)i;
+        pp += 47;
+        ii -= 175;
+        double keskimerd = 3500000;
+        double keskimerdlamda = 27;
+        double xhiprim = pp/6367654.5;
+        double a2xhiprim = 2*xhiprim;
+        double a4xhiprim = 4*xhiprim;
+        double a6xhiprim = 6*xhiprim;
+        double xhi = xhiprim + (0.1449300705 * Math.sin(a2xhiprim) + 0.0002138508 * Math.sin(a4xhiprim)
+                + 0.0000004322 * Math.sin(a6xhiprim)) / (180/Math.PI);
+        double v2 = 1+0.00676817019722 * Math.cos(xhi) * Math.cos(xhi);
+        double y = ii - keskimerd;
+        double tani = Math.sqrt(v2)*Math.sinh(y / 6399936.608) / Math.cos(xhi);
+        double i2 = Math.atan(tani);
+        double tanphi = Math.tan(xhi) * Math.cos(Math.sqrt(v2) * i2);
+        double phi = Math.toDegrees(Math.atan(tanphi));
+        double n = phi;
+        double lamda = Math.toDegrees(i2) + keskimerdlamda;
+        double e = lamda;
+        double[] result = {n,e};
+        return result;
     }
 
 }
