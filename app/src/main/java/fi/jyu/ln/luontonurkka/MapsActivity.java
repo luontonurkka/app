@@ -1,28 +1,21 @@
 package fi.jyu.ln.luontonurkka;
 
-import android.*;
-import android.app.Activity;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.app.FragmentActivity;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback  {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener {
 
     private GoogleMap mMap;
+    private Marker chosenLocation;
 
     /* LastKnownLocation Constant Permission */
     private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
@@ -49,8 +42,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnMapClickListener(this);
         LatLng loc = new LatLng(62.232436, 25.737582);
         mMap.addMarker(new MarkerOptions().position(loc).title("Marker in device location"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(loc));
+    }
+
+    @Override
+    public void onMapClick(LatLng point) {
+        chosenLocation = mMap.addMarker(new MarkerOptions()
+                .position(point)
+                .title("Jyväskylän keskusta")
+                .snippet("YKJ: 690:343\n" +
+                        "364 lintua\n" +
+                        "1284 kasvia")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                .infoWindowAnchor(0.5f, 0.5f));
     }
 }
