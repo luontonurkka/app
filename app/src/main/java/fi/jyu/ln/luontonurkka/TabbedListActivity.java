@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -136,13 +137,14 @@ public class TabbedListActivity extends AppCompatActivity {
             public View getView(int position, View convertView, ViewGroup parent) {
                 final Species species = (Species)getItem(position);
                 LayoutInflater inflater = (LayoutInflater)context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
-                View row = inflater.inflate(R.layout.specieslistobject_layout, null, true);
+                final View row = inflater.inflate(R.layout.specieslistobject_layout, null, true);
                 TextView textView = (TextView)row.findViewById(R.id.list_name);
                 textView.setText(species.getName());
-                row.setOnClickListener(new View.OnClickListener() {
+                Button button = (Button)row.findViewById(R.id.list_button);
+                button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ((TabbedListActivity)v.getContext()).openSpeciesView(species);
+                        ((TabbedListActivity)row.getContext()).openSpeciesView(species);
                     }
                 });
                 return row;
