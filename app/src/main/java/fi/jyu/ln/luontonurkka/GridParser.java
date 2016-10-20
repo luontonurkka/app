@@ -1,7 +1,6 @@
 package fi.jyu.ln.luontonurkka;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -14,31 +13,18 @@ public class GridParser extends Parser {
     /**
      * Parses a CSV file of the following form:
      * coordinates, species, species, species, ...
-     * Creates a hash map with coordinates as key (two integers) and all species in the square as value (list of strings).
+     * Creates a hash map with coordinates as key (string, "366:490") and all species in the square as value (comma separated string).
      * @return HashMap with grid coordinates as key and species in square as value
      * @throws IOException
      */
     @Override
-    protected HashMap parseFile() throws IOException {
-        HashMap<ArrayList<Integer>, ArrayList<String>> grid = new HashMap<>();
+    protected HashMap<String, String> parseFile() throws IOException {
+        HashMap<String, String> grid = new HashMap<>();
         String csvLine;
         while ((csvLine = buffer.readLine()) != null) {
-            String[] splitLine = csvLine.split("\\s*,\\s*");
-
-            String[] coordsAsString = splitLine[0].split(":");
-            int n = Integer.parseInt(coordsAsString[0]);
-            int e = Integer.parseInt(coordsAsString[1]);
-            ArrayList<Integer> coords = new ArrayList<Integer>();
-            coords.add(n);
-            coords.add(e);
-
-            ArrayList<String> allSpeciesInSquare = new ArrayList<String>();
-            if (splitLine.length > 1) {
-                for (int i = 1; i < splitLine.length; i++) {
-                    allSpeciesInSquare.add(splitLine[i]);
-                }
+            if (csvLine.length() >= 7) {
+                grid.put(csvLine.substring(0, 7), csvLine.substring(8));
             }
-            grid.put(coords, allSpeciesInSquare);
         }
         return grid;
     }
