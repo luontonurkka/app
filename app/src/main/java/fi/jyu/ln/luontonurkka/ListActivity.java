@@ -13,6 +13,11 @@ public class ListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_list);
     }
 
+    protected void openMapsView(View view) {
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
+    }
+
     protected void openSpeciesView(View view) {
 
         Species.SpeciesBuilder sb = new Species.SpeciesBuilder("Kissa", 1);
