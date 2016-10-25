@@ -3,9 +3,10 @@ package fi.jyu.ln.luontonurkka.tools;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 /**
- * Created by jarno on 10/22/16.
+ * Created by Jarno 22.10.16
  */
 
 public class SettingsManager {
@@ -13,6 +14,7 @@ public class SettingsManager {
     private SharedPreferences sp;
 
     public SettingsManager(Activity activity) {
+        PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
         sp = activity.getPreferences(Context.MODE_PRIVATE);
     }
 
