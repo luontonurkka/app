@@ -19,11 +19,11 @@ import java.util.HashMap;
 
 import fi.jyu.ln.luontonurkka.tools.CoordinateConverter;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener {
 
     private GoogleMap mMap;
     private Marker locationMarker;
-    private static final String ARG_SPECIES_LIST = "species_list";
+    protected static final String ARG_SPECIES_LIST = "species_list";
     private ArrayList<Species> speciesInSquare;
 
     /* LastKnownLocation Constant Permission */
@@ -50,13 +50,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setOnMapClickListener(this);
 
         //Luontonurkka hq
         LatLng loc = new LatLng(62.232436, 25.737582);
 
         locationMarker = mMap.addMarker(new MarkerOptions().position(loc).title("Marker in device location"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, 17));
+
+        mMap.setOnMapClickListener(this);
+        mMap.setOnInfoWindowClickListener(this);
     }
 
     @Override
@@ -91,7 +93,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             for (String s :
                     speciesSplit) {
                 String name = s.split(":")[0];
-                Species.SpeciesBuilder sb = new Species.SpeciesBuilder("name", 1);
+                Species.SpeciesBuilder sb = new Species.SpeciesBuilder(name, 1);
                 Species spec = sb.build();
                 speciesInSquare.add(spec);
             }
@@ -111,8 +113,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    //called when user clicks infowindow
-    public void openSpecies(View view) {
+    /**
+     * Called when user clicks infowindow
+     * @param marker Marker of the infowindow
+     */
+    @Override
+    public void onInfoWindowClick(Marker marker) {
         Intent intent = new Intent(this, TabbedListActivity.class);
         intent.putExtra(ARG_SPECIES_LIST, speciesInSquare);
         startActivity(intent);
