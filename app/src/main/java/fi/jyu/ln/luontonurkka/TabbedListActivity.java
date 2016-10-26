@@ -68,7 +68,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
     }
 
     /**
-     * A placeholder fragment containing a simple view.
+     * Fragment creating species list
      */
     public static class ListFragment extends Fragment {
         /**
@@ -192,12 +192,27 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         }
     }
 
+    /**
+     * Opens the species view activity.
+     * @param species   Species object on which more info will be shown
+     */
     protected void openSpeciesView(Species species) {
 
         Intent intent = new Intent(this, SpeciesActivity.class);
         intent.putExtra("Species", species);
 
         startActivity(intent);
+    }
+
+    /**
+     * Shows settings drawer. Called from three vertical lines button.
+     * @param view  View that calling the method
+     */
+    public void showDrawer(View view) {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (!drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.openDrawer(GravityCompat.START);
+        }
     }
 
     public void showAllTab(View view) {
@@ -242,9 +257,9 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        /*if (id == R.id.action_settings) {
             return true;
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }

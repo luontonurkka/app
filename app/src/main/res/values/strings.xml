@@ -6,17 +6,19 @@
     </string>
     <string name="action_settings">Settings</string>
     <string name="read_more_wiki">Lue lisää wikipediasta</string>
-
-    <string name="title_activity_tabbed">TabbedActivity</string>
-
+    <string name="title_activity_tabbed">Luontonurkka App</string>
     <string name="tab_all">Kaikki</string>
     <string name="tab_birds">Linnut</string>
     <string name="tab_plants">Kasvit</string>
 
-    <string name="title_activity_settings">Settings</string>
+    <string name="setting_night_theme">night-theme</string>
+    <string name="setting_disable_gps">use-gps</string>
+    <string name="setting_map_default">map-default</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="disable_gps">Poista GPS käytöstä</string>
+    <string name="map_default">Karttanäkymä aloitussivuna</string>
+    <string name="night_theme">Yö teema</string>
+
 
     <string name="title_activity_maps">Map</string>
 </resources>
