@@ -1,5 +1,7 @@
 package fi.jyu.ln.luontonurkka;
 
+import android.app.ActionBar;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
@@ -20,12 +22,15 @@ import android.view.ViewGroup;
 
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.GridLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
 public class TabbedListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    private static ArrayList<Species> speciesInSquare;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -46,6 +51,10 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabbed);
+
+        //get intent
+        Intent intent = getIntent();
+        speciesInSquare = (ArrayList) intent.getSerializableExtra(MapsActivity.ARG_SPECIES_LIST);
 
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
@@ -87,11 +96,12 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.activity_list, container, false);
+            //TextView textView = (TextView) rootView.findViewById(R.id.section_label);
+            //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+//            ArrayList<Species> speciesList = (ArrayList<Species>) getArguments().getSerializable(ARG_SPECIES_LIST);
 
-            // get list of species from the arguments
-            ArrayList<Species> speciesList = (ArrayList<Species>) getArguments().getSerializable(ARG_SPECIES_LIST);
-
-            SpeciesListAdapter sla = new SpeciesListAdapter(container.getContext(), speciesList);
+//            SpeciesListAdapter sla = new SpeciesListAdapter(container.getContext(), speciesList);
+            SpeciesListAdapter sla = new SpeciesListAdapter(container.getContext(), speciesInSquare);
 
             ListView listView = (ListView)rootView.findViewById(R.id.species_list);
             listView.setAdapter(sla);
@@ -144,23 +154,22 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             // getItem is called to instantiate the fragment for the given page.
             // Return a ListFragment (defined as a static inner class below).
 
-            // TODO create lists in a method
-            ArrayList<Species> testiLista = new ArrayList<Species>(10);
-            for (int i = 0;i < 10; i++) {
-                if(i > 5) {
-                    Species.SpeciesBuilder sb = new Species.SpeciesBuilder("Koira", 1);
-                    sb.descr("Koira on myös kovis");
-                    Species s = sb.build();
-                    testiLista.add(i,s);
-                } else {
-                    Species.SpeciesBuilder sb = new Species.SpeciesBuilder("Kissa", 1);
-                    sb.descr("Kissa on kovis");
-                    Species s = sb.build();
-                    testiLista.add(i, s);
-                }
-            }
+//            ArrayList<Species> testiLista = new ArrayList<Species>(10);
+//            for (int i = 0;i < 10; i++) {
+//                if(i > 5) {
+//                    Species.SpeciesBuilder sb = new Species.SpeciesBuilder("Koira", 1);
+//                    sb.descr("Koira on myös kovis");
+//                    Species s = sb.build();
+//                    testiLista.add(i,s);
+//                } else {
+//                    Species.SpeciesBuilder sb = new Species.SpeciesBuilder("Kissa", 1);
+//                    sb.descr("Kissa on kovis");
+//                    Species s = sb.build();
+//                    testiLista.add(i, s);
+//                }
+//            }
 
-            return ListFragment.newInstance(position + 1, testiLista);
+            return ListFragment.newInstance(position + 1, speciesInSquare);
         }
 
         @Override
@@ -231,6 +240,13 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.settings, menu);
+        return true;
     }
 
     @Override
