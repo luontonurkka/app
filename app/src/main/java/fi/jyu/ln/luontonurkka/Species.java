@@ -5,30 +5,35 @@ import java.io.Serializable;
 /**
  * A class representing a species, using builder design pattern.
  * Created by sinikka on 7.10.2016.
- * Edited by Jarno on 10.10.2016.
+ * Edited by Jarno on 26.10.2016.
  */
 
 public class Species implements Serializable {
 
-    private final String name;      //required
     /*
     1 = bird
     2 = plant
      */
+    public static final int BIRD = 1;
+    public static final int PLANT = 2;
+
+    private final String name;      //required
     private final int type;         //required
-    private final String descr;     //optional
+    private String idEng;
+    private String idFin;
 
     private Species(SpeciesBuilder builder) {
         this.name = builder.name;
         this.type = builder.type;
-        this.descr = builder.descr;
+        this.idEng = builder.idEng;
+        this.idFin = builder.idFin;
     }
 
-    protected String getName() {
+    public String getName() {
         return name;
     }
 
-    protected int getType() {
+    public int getType() {
         return type;
     }
 
@@ -36,21 +41,26 @@ public class Species implements Serializable {
         return name;
     }
 
-    public String getDescr() { return descr; }
+    public String getIdEng() { return idEng; }
+    public String getIdFin() { return idFin; }
 
     public static class SpeciesBuilder {
         private final String name;      //required
         private final int type;         //required
-        private String descr;         //optional
+        private String idEng = "";
+        private String idFin = "";
 
         public SpeciesBuilder(String name, int type) {
             this.name = name;
             this.type = type;
         }
 
-        public SpeciesBuilder descr(String descr) {
-            this.descr = descr;
-            return this;
+        public void setWikiIdEng(String id) {
+            idEng = id;
+        }
+
+        public void setWikiIdFin(String id) {
+            idFin = id;
         }
 
         public Species build() {
