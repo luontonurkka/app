@@ -61,7 +61,22 @@ public class SpeciesActivity extends AppCompatActivity {
         final ImageView imgView = (ImageView)this.findViewById(species_toolbar_img);
         imgView.setImageResource(R.drawable.kissa);
 
-        // get text from wikipage
+        final TextView contentTextView = (TextView)this.findViewById(species_content_text);
+
+        OnTaskCompleted task = new OnTaskCompleted() {
+            @Override
+            public void onTaskCompleted(String result) {
+
+            }
+
+            @Override
+            public void onTaskCompleted(Bitmap result) {
+
+            }
+        };
+
+
+        /*// get text from wikipage
         final TextView contentTextView = (TextView)this.findViewById(species_content_text);
         contentTextView.setText("Lataa...");
         OnTaskCompleted task = new OnTaskCompleted() {
@@ -97,30 +112,11 @@ public class SpeciesActivity extends AppCompatActivity {
 
             }
         };
-        new DownloadTextTask(task).execute("https://fi.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=" + species.getName());
+        new DownloadTextTask(task).execute("https://fi.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=" + species.getName());*/
     }
 
     protected void openWikiPage(String pageId) {
         Intent wikiIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://fi.wikipedia.org/?curid=" + pageId));
         startActivity(wikiIntent);
-
-        // get text from desc
-        TextView contentTextView = (TextView)this.findViewById(species_content_text);
-        contentTextView.setText(species.getDescr());
-
-        // get img
-        ImageView imgView = (ImageView)this.findViewById(species_toolbar_img);
-        imgView.setImageResource(R.drawable.kissa);
-    }
-
-    private static Drawable LoadImageFromUrl(String url) {
-        try {
-            InputStream is = (InputStream)new URL(url).getContent();
-            Drawable d = Drawable.createFromStream(is, "img");
-            return d;
-        } catch(Exception e) {
-            Log.w("SpeciesAcitivty", "Image " + url + " load failed");
-            return null;
-        }
     }
 }

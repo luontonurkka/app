@@ -26,7 +26,7 @@ public class SpeciesParser extends Parser {
         while ((csvLine = buffer.readLine()) != null) {
             String[] splitLine = csvLine.split("\\s*,\\s*");
             Species newSpecies = new Species.SpeciesBuilder(splitLine[0], Integer.parseInt(splitLine[1]))
-                    .descr(splitLine[2])
+                    //.descr(splitLine[2])
                     .build();
             allSpecies.put(splitLine[0], newSpecies);
         }

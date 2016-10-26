@@ -55,12 +55,14 @@ public class Species implements Serializable {
             this.type = type;
         }
 
-        public void setWikiIdEng(String id) {
+        public SpeciesBuilder setWikiIdEng(String id) {
             idEng = id;
+            return this;
         }
 
-        public void setWikiIdFin(String id) {
+        public SpeciesBuilder setWikiIdFin(String id) {
             idFin = id;
+            return this;
         }
 
         public Species build() {

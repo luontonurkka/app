@@ -61,12 +61,10 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             for (int i = 0;i < 10; i++) {
                if(i > 5) {
                     Species.SpeciesBuilder sb = new Species.SpeciesBuilder("Koira", 1);
-                    sb.descr("Koira on myös kovis");
                     Species s = sb.build();
                     testiLista.add(i,s);
                 } else {
                     Species.SpeciesBuilder sb = new Species.SpeciesBuilder("Kissa", 1);
-                    sb.descr("Kissa on kovis");
                     Species s = sb.build();
                     testiLista.add(i, s);
                }
