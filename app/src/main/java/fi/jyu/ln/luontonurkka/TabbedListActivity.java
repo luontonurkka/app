@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -55,6 +56,23 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         //get intent
         Intent intent = getIntent();
         speciesInSquare = (ArrayList) intent.getSerializableExtra(MapsActivity.ARG_SPECIES_LIST);
+        if (speciesInSquare == null) {
+            ArrayList<Species> testiLista = new ArrayList<Species>(10);
+            for (int i = 0;i < 10; i++) {
+               if(i > 5) {
+                    Species.SpeciesBuilder sb = new Species.SpeciesBuilder("Koira", 1);
+                    sb.descr("Koira on myös kovis");
+                    Species s = sb.build();
+                    testiLista.add(i,s);
+                } else {
+                    Species.SpeciesBuilder sb = new Species.SpeciesBuilder("Kissa", 1);
+                    sb.descr("Kissa on kovis");
+                    Species s = sb.build();
+                    testiLista.add(i, s);
+               }
+            }
+            speciesInSquare = testiLista;
+        }
 
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
@@ -98,10 +116,10 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             View rootView = inflater.inflate(R.layout.activity_list, container, false);
             //TextView textView = (TextView) rootView.findViewById(R.id.section_label);
             //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-//            ArrayList<Species> speciesList = (ArrayList<Species>) getArguments().getSerializable(ARG_SPECIES_LIST);
+            ArrayList<Species> speciesList = (ArrayList<Species>) getArguments().getSerializable(ARG_SPECIES_LIST);
 
-//            SpeciesListAdapter sla = new SpeciesListAdapter(container.getContext(), speciesList);
-            SpeciesListAdapter sla = new SpeciesListAdapter(container.getContext(), speciesInSquare);
+            SpeciesListAdapter sla = new SpeciesListAdapter(container.getContext(), speciesList);
+            //SpeciesListAdapter sla = new SpeciesListAdapter(container.getContext(), speciesInSquare);
 
             ListView listView = (ListView)rootView.findViewById(R.id.species_list);
             listView.setAdapter(sla);
