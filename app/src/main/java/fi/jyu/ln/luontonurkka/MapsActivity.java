@@ -25,6 +25,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Marker locationMarker;
     protected static final String ARG_SPECIES_LIST = "species_list";
     private ArrayList<Species> speciesInSquare;
+    protected static final String FROM_MAP_VIEW = "from_map_view";
 
     /* LastKnownLocation Constant Permission */
     private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
@@ -121,6 +122,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onInfoWindowClick(Marker marker) {
         Intent intent = new Intent(this, TabbedListActivity.class);
         intent.putExtra(ARG_SPECIES_LIST, speciesInSquare);
+        intent.putExtra(FROM_MAP_VIEW, true);
         startActivity(intent);
     }
 }
