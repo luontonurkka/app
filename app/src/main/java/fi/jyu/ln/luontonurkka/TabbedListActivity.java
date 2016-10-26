@@ -221,6 +221,14 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
     }
 
     /**
+     * Opens the map view activity.
+     */
+    protected void openMapView(View view) {
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
+    }
+
+    /**
      * Shows settings drawer. Called from three vertical lines button.
      * @param view  View that calling the method
      */
