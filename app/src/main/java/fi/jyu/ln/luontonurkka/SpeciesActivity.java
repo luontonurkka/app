@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.json.JSONException;
@@ -23,6 +24,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Iterator;
 
+import fi.jyu.ln.luontonurkka.tools.DownloadImageTask;
 import fi.jyu.ln.luontonurkka.tools.DownloadTextTask;
 import fi.jyu.ln.luontonurkka.tools.OnTaskCompleted;
 
@@ -41,6 +43,9 @@ public class SpeciesActivity extends AppCompatActivity {
 
     private static final int DESCRIPTION_LENGTH = 1000;
 
+    private String speciesDesc;
+    private Bitmap speciesImg;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,22 +63,31 @@ public class SpeciesActivity extends AppCompatActivity {
         layout.setCollapsedTitleTextColor(Color.WHITE);
 
         // get img
-        final ImageView imgView = (ImageView)this.findViewById(species_toolbar_img);
-        imgView.setImageResource(R.drawable.kissa);
+        /*final ImageView imgView = (ImageView)this.findViewById(species_toolbar_img);
+        imgView.setImageResource(R.drawable.kissa);*/
 
-        final TextView contentTextView = (TextView)this.findViewById(species_content_text);
+        String id = species.getIdFin();
+        if(id.length() < 1)
+            id = species.getIdEng();
 
         OnTaskCompleted task = new OnTaskCompleted() {
             @Override
             public void onTaskCompleted(String result) {
-
+                Log.d(getClass().toString(), "TEXT");
+                if(result != null)
+                    setTextComplete(result);
             }
 
             @Override
             public void onTaskCompleted(Bitmap result) {
-
+                Log.d(getClass().toString(), "IMG");
+                if(result != null)
+                    setImgComplete(result);
             }
         };
+        new DownloadTextTask(task).execute("https://fi.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&pageids=" + id);
+
+        new DownloadImageTask(task).execute("https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_March_2010-1.jpg");
 
 
         /*// get text from wikipage
@@ -118,5 +132,35 @@ public class SpeciesActivity extends AppCompatActivity {
     protected void openWikiPage(String pageId) {
         Intent wikiIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://fi.wikipedia.org/?curid=" + pageId));
         startActivity(wikiIntent);
+    }
+
+    private void setTextComplete(String text) {
+        speciesDesc = text;
+        checkLoadingComplete();
+    }
+
+    private void setImgComplete(Bitmap img) {
+        speciesImg = img;
+        checkLoadingComplete();
+    }
+
+    private void checkLoadingComplete() {
+        if(speciesImg != null && speciesDesc != null) {
+
+            TextView textView = (TextView)findViewById(R.id.species_content_text);
+            textView.setText(speciesDesc);
+
+            ImageView imgView = (ImageView)findViewById(R.id.species_toolbar_img);
+            imgView.setImageBitmap(speciesImg);
+
+            ProgressBar loadingBar = (ProgressBar)findViewById(R.id.species_loading);
+            Button wikiButton = (Button)findViewById(R.id.species_content_button_wiki);
+
+            loadingBar.setVisibility(View.INVISIBLE);
+
+            wikiButton.setVisibility(View.VISIBLE);
+            textView.setVisibility(View.VISIBLE);
+            imgView.setVisibility(View.VISIBLE);
+        }
     }
 }
