@@ -18,7 +18,7 @@ public class GridParser extends Parser {
      * @throws IOException
      */
     @Override
-    protected HashMap<String, String> parseFile() throws IOException {
+    public HashMap<String, String> parseFile() throws IOException {
         HashMap<String, String> grid = new HashMap<>();
         String csvLine;
         while ((csvLine = buffer.readLine()) != null) {

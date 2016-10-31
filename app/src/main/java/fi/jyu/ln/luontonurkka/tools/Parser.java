@@ -19,12 +19,12 @@ public abstract class Parser {
 
     protected abstract HashMap<String, String> parseFile() throws IOException;
 
-    protected BufferedReader openFile(InputStream is) {
+    public BufferedReader openFile(InputStream is) {
         buffer = new BufferedReader(new InputStreamReader(is));
         return buffer;
     }
 
-    protected void closeFile() throws IOException {
+    public void closeFile() throws IOException {
         if (buffer != null) {
             buffer.close();
         }
