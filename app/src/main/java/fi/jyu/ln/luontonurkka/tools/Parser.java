@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 
@@ -18,8 +19,8 @@ public abstract class Parser {
 
     protected abstract HashMap<String, String> parseFile() throws IOException;
 
-    protected BufferedReader openFile(File f) throws FileNotFoundException {
-        buffer = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+    protected BufferedReader openFile(InputStream is) {
+        buffer = new BufferedReader(new InputStreamReader(is));
         return buffer;
     }
 
