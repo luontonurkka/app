@@ -27,6 +27,7 @@ import java.util.Iterator;
 import fi.jyu.ln.luontonurkka.tools.DownloadImageTask;
 import fi.jyu.ln.luontonurkka.tools.DownloadTextTask;
 import fi.jyu.ln.luontonurkka.tools.OnTaskCompleted;
+import fi.jyu.ln.luontonurkka.tools.WikiFetcher;
 
 import static fi.jyu.ln.luontonurkka.R.id.species_content_text;
 import static fi.jyu.ln.luontonurkka.R.id.species_toolbar_img;
@@ -85,7 +86,8 @@ public class SpeciesActivity extends AppCompatActivity {
                     setImgComplete(result);
             }
         };
-        new DownloadTextTask(task).execute("https://fi.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&pageids=" + id);
+        //ew DownloadTextTask(task).execute("https://fi.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&pageids=" + id);
+        WikiFetcher.getWikiDescription(species.getIdFin(), task);
 
         new DownloadImageTask(task).execute("https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_March_2010-1.jpg");
 
@@ -148,6 +150,8 @@ public class SpeciesActivity extends AppCompatActivity {
         if(speciesImg != null && speciesDesc != null) {
 
             TextView textView = (TextView)findViewById(R.id.species_content_text);
+            if(speciesDesc.length() > DESCRIPTION_LENGTH)
+                speciesDesc = speciesDesc.substring(0,DESCRIPTION_LENGTH) + "...";
             textView.setText(speciesDesc);
 
             ImageView imgView = (ImageView)findViewById(R.id.species_toolbar_img);
