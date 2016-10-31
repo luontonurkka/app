@@ -75,7 +75,7 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         <android.support.design.widget.FloatingActionButton
-            android:src="@drawable/ic_map"
+            android:src="@drawable/ic_menu_share"
             app:fabSize="normal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
