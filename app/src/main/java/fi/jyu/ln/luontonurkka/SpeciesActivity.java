@@ -82,9 +82,10 @@ public class SpeciesActivity extends AppCompatActivity {
                     setImgComplete(result);
             }
         };
-        WikiFetcher.getWikiDescription(id, task);
+        WikiFetcher.getWikiDescription(id, task, "fi");
 
         new DownloadImageTask(task).execute("https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_March_2010-1.jpg");
+
 
     }
 

@@ -13,7 +13,7 @@ import java.util.Iterator;
 
 public class WikiFetcher {
 
-    public static void getWikiDescription(String pageId, OnTaskCompleted task) {
+    public static void getWikiDescription(String pageId, OnTaskCompleted task, String lang) {
         final OnTaskCompleted tt = task;
         OnTaskCompleted t = new OnTaskCompleted() {
             @Override
@@ -27,7 +27,7 @@ public class WikiFetcher {
             }
         };
 
-        new DownloadTextTask(t).execute("https://fi.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&pageids=" + pageId);
+        new DownloadTextTask(t).execute("https://" + lang + ".wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&pageids=" + pageId);
     }
 
     public static String getDescriptionFromJson(String json) {
