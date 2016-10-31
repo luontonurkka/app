@@ -33,11 +33,11 @@
 
         <ProgressBar
             style="?android:attr/progressBarStyle"
+            android:layout_margin="@dimen/text_margin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/species_content_text"
             android:layout_centerHorizontal="true"
-            android:id="@+id/progressBar2" />
+            android:id="@+id/species_loading" />
 
     </RelativeLayout>
 

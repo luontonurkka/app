@@ -60,12 +60,10 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             ArrayList<Species> testiLista = new ArrayList<Species>(10);
             for (int i = 0;i < 10; i++) {
                if(i > 5) {
-                    Species.SpeciesBuilder sb = new Species.SpeciesBuilder("Koira", 1);
-                    Species s = sb.build();
+                    Species s = new Species.SpeciesBuilder("Koira", 1).setWikiIdFin("612").build();
                     testiLista.add(i,s);
                 } else {
-                    Species.SpeciesBuilder sb = new Species.SpeciesBuilder("Kissa", 1);
-                    Species s = sb.build();
+                    Species s = new Species.SpeciesBuilder("Kissa", 1).setWikiIdFin("7064").build();
                     testiLista.add(i, s);
                }
             }
