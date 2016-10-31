@@ -63,10 +63,6 @@ public class SpeciesActivity extends AppCompatActivity {
         layout.setExpandedTitleColor(Color.WHITE);
         layout.setCollapsedTitleTextColor(Color.WHITE);
 
-        // get img
-        /*final ImageView imgView = (ImageView)this.findViewById(species_toolbar_img);
-        imgView.setImageResource(R.drawable.kissa);*/
-
         String id = species.getIdFin();
         if(id.length() < 1)
             id = species.getIdEng();
@@ -86,49 +82,10 @@ public class SpeciesActivity extends AppCompatActivity {
                     setImgComplete(result);
             }
         };
-        //ew DownloadTextTask(task).execute("https://fi.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&pageids=" + id);
-        WikiFetcher.getWikiDescription(species.getIdFin(), task);
+        WikiFetcher.getWikiDescription(id, task);
 
         new DownloadImageTask(task).execute("https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_March_2010-1.jpg");
 
-
-        /*// get text from wikipage
-        final TextView contentTextView = (TextView)this.findViewById(species_content_text);
-        contentTextView.setText("Lataa...");
-        OnTaskCompleted task = new OnTaskCompleted() {
-            @Override
-            public void onTaskCompleted(String result) {
-                try {
-                    final JSONObject obj = new JSONObject(result);
-                    Iterator<String> keys = obj.getJSONObject("query").getJSONObject("pages").keys();
-                    if (keys.hasNext()) {
-                        final String firstKey = (String)keys.next();
-                        String desc = obj.getJSONObject("query").getJSONObject("pages").getJSONObject(firstKey).getString("extract");
-                        if(desc.length() > DESCRIPTION_LENGTH) {
-                            desc = desc.substring(0,DESCRIPTION_LENGTH) + "...";
-                        }
-                        contentTextView.setText(desc);
-                        Button wikiButton = (Button)findViewById(R.id.species_content_button_wiki);
-                        wikiButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                openWikiPage(firstKey);
-                            }
-                        });
-                        wikiButton.setVisibility(View.VISIBLE);
-
-                    }
-                } catch (JSONException je) {
-                    Log.w(getClass().toString(), je.getMessage());
-                }
-            }
-
-            @Override
-            public void onTaskCompleted(Bitmap result) {
-
-            }
-        };
-        new DownloadTextTask(task).execute("https://fi.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=" + species.getName());*/
     }
 
     protected void openWikiPage(String pageId) {
