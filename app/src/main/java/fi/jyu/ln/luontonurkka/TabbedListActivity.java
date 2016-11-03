@@ -4,6 +4,8 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
+import android.os.AsyncTask;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -53,6 +55,8 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabbed);
 
+        updateLocation();
+        /*
         //get intent
         Intent intent = getIntent();
         speciesInSquare = (ArrayList) intent.getSerializableExtra(MapsActivity.ARG_SPECIES_LIST);
@@ -79,6 +83,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.list_pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        */
     }
 
     /**
@@ -167,21 +172,6 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a ListFragment (defined as a static inner class below).
-
-//            ArrayList<Species> testiLista = new ArrayList<Species>(10);
-//            for (int i = 0;i < 10; i++) {
-//                if(i > 5) {
-//                    Species.SpeciesBuilder sb = new Species.SpeciesBuilder("Koira", 1);
-//                    sb.descr("Koira on myös kovis");
-//                    Species s = sb.build();
-//                    testiLista.add(i,s);
-//                } else {
-//                    Species.SpeciesBuilder sb = new Species.SpeciesBuilder("Kissa", 1);
-//                    sb.descr("Kissa on kovis");
-//                    Species s = sb.build();
-//                    testiLista.add(i, s);
-//                }
-//            }
 
             return ListFragment.newInstance(position + 1, speciesInSquare);
         }
@@ -302,5 +292,42 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void updateLocation() {
+        LastKnownLocation lkl = new LastKnownLocation(this.getApplicationContext(), this);
+        lkl.connectAPI();
+        /*Location loc;
+        do {
+            loc = lkl.getLocation();
+        } while (loc == null);
+        Log.d(getClass().toString(), loc.toString());*/
+
+        speciesInSquare = getSpeciesList(0,0);
+
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) findViewById(R.id.list_pager);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+    }
+
+    public ArrayList<Species> getSpeciesList(int n, int e) {
+        Intent intent = getIntent();
+        ArrayList<Species> species = (ArrayList) intent.getSerializableExtra(MapsActivity.ARG_SPECIES_LIST);
+        if (species == null) {
+            ArrayList<Species> testiLista = new ArrayList<Species>(10);
+            for (int i = 0;i < 10; i++) {
+                if(i > 5) {
+                    Species s = new Species.SpeciesBuilder("Koira", 1).setWikiIdFin("612").build();
+                    testiLista.add(i,s);
+                } else {
+                    Species s = new Species.SpeciesBuilder("Kissa", 1).setWikiIdFin("7064").build();
+                    testiLista.add(i, s);
+                }
+            }
+            species = testiLista;
+        }
+        return species;
     }
 }
