@@ -38,6 +38,7 @@ import fi.jyu.ln.luontonurkka.tools.CoordinateConverter;
 public class TabbedListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static ArrayList<Species> speciesInSquare;
+    private int[] lastLocation = {0,0};
 
     private LastKnownLocation lkl;
 
@@ -62,34 +63,6 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         setContentView(R.layout.activity_tabbed);
 
         updateLocation();
-        /*
-        //get intent
-        Intent intent = getIntent();
-        speciesInSquare = (ArrayList) intent.getSerializableExtra(MapsActivity.ARG_SPECIES_LIST);
-        if (speciesInSquare == null) {
-            ArrayList<Species> testiLista = new ArrayList<Species>(10);
-            for (int i = 0;i < 10; i++) {
-               if(i > 5) {
-                    Species s = new Species.SpeciesBuilder("Koira", 1).setWikiIdFin("612").build();
-                    testiLista.add(i,s);
-                } else {
-                    Species s = new Species.SpeciesBuilder("Kissa", 1).setWikiIdFin("7064").build();
-                    testiLista.add(i, s);
-               }
-            }
-            speciesInSquare = testiLista;
-        }
-
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.list_pager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-        */
     }
 
     /**
@@ -301,34 +274,25 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
     }
 
     public void updateLocation() {
-        lkl = new LastKnownLocation(this.getApplicationContext(), this);
-
-        AsyncTask a = new AsyncTask<Void, Void, Void>() {
+        lkl = new LastKnownLocation(this.getApplicationContext(), this, new Runnable() {
+            // get called when location changes
             @Override
-            protected Void doInBackground(Void... params) {
-                Location loc;
-                do {
-                    loc = lkl.getLocation();
-                } while (loc == null);
+            public void run() {
+                Log.d(getClass().toString(), "location changed");
+                // get new location
+                Location loc = lkl.getLocation();
+                // convert coordinate
                 int[] ykj = CoordinateConverter.WGSToYKJ(loc.getLatitude(), loc.getLongitude());
-
-                speciesInSquare = getSpeciesList(ykj[0], ykj[1]);
-
-                mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-                // Set up the ViewPager with the sections adapter.
-                mViewPager = (ViewPager) findViewById(R.id.list_pager);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mViewPager.setAdapter(mSectionsPagerAdapter);
-                    }
-                });
-
-                return null;
+                // only update list if in different grid square
+                if(lastLocation[0] != ykj[0] && lastLocation[1] != ykj[1]) {
+                    speciesInSquare = getSpeciesList(ykj[0], ykj[1]);
+                    mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+                    mViewPager = (ViewPager) findViewById(R.id.list_pager);
+                    mViewPager.setAdapter(mSectionsPagerAdapter);
+                    lastLocation = ykj;
+                }
             }
-        };
-        a.execute(new Void[0]);
+        });
     }
 
     @Override
