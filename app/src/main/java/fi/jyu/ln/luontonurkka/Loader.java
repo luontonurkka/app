@@ -17,8 +17,8 @@ public class Loader extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loader);
         //not working as intented, take a closer look
-        LastKnownLocation asd = new LastKnownLocation(this,this);
-        final Location proop = asd.getLocation();
+        //LastKnownLocation asd = new LastKnownLocation(this,this);
+        //final Location proop = asd.getLocation();
 
         final Intent intent1 = new Intent(this, TabbedListActivity.class);
         //intent1.putExtra("species_list",);
