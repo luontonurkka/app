@@ -19,8 +19,9 @@
     <string name="map_default">Karttanäkymä aloitussivuna</string>
     <string name="night_theme">Yö teema</string>
 
-
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_loader">Loader</string>
     <string name = "loading_text">Ladataan, pieni hetki</string>
+
+    <item type="integer" name="databaseVersion" format="integer">1</item>
 </resources>

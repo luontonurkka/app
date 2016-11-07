@@ -2,6 +2,7 @@ package fi.jyu.ln.luontonurkka;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,6 +10,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import java.io.BufferedReader;
@@ -25,20 +27,32 @@ public class Loader extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loader);
 
-        //not working as intented, take a closer look
-        LastKnownLocation asd = new LastKnownLocation(this,this);
-        final Location proop = asd.getLocation();
+        DatabaseHelper myDbHelper;
+        SQLiteDatabase myDb = null;
 
+        myDbHelper = new DatabaseHelper(this);
+        /*
+         * Database must be initialized before it can be used. This will ensure
+         * that the database exists and is the current version.
+         */
+        myDbHelper.initializeDataBase();
 
-        //reading grid csv to hashmap
-        GridParser p = new GridParser();
-        InputStream is = getResources().openRawResource(R.raw.grid_sorted);
-        p.openFile(is);
         try {
-            HashMap<String, String> grid = p.parseFile();
-            p.closeFile();
-        } catch (IOException e) {
-            e.printStackTrace();
+            // A reference to the database can be obtained after initialization.
+            myDb = myDbHelper.getWritableDatabase();
+            /*
+             * Place code to use database here.
+             */
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                myDbHelper.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            } finally {
+                myDb.close();
+            }
         }
 
         final Intent intent1 = new Intent(this, TabbedListActivity.class);
