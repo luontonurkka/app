@@ -4,6 +4,8 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
+import android.os.AsyncTask;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -27,11 +29,18 @@ import android.widget.GridLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+
 import java.util.ArrayList;
+
+import fi.jyu.ln.luontonurkka.tools.CoordinateConverter;
 
 public class TabbedListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static ArrayList<Species> speciesInSquare;
+    private int[] lastLocation = {0,0};
+
+    private LastKnownLocation lkl;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -53,32 +62,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabbed);
 
-        //get intent
-        Intent intent = getIntent();
-        speciesInSquare = (ArrayList) intent.getSerializableExtra(MapsActivity.ARG_SPECIES_LIST);
-        if (speciesInSquare == null) {
-            ArrayList<Species> testiLista = new ArrayList<Species>(10);
-            for (int i = 0;i < 10; i++) {
-               if(i > 5) {
-                    Species s = new Species.SpeciesBuilder("Koira", 1).setWikiIdFin("612").build();
-                    testiLista.add(i,s);
-                } else {
-                    Species s = new Species.SpeciesBuilder("Kissa", 1).setWikiIdFin("7064").build();
-                    testiLista.add(i, s);
-               }
-            }
-            speciesInSquare = testiLista;
-        }
-
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.list_pager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        updateLocation();
     }
 
     /**
@@ -167,21 +151,6 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a ListFragment (defined as a static inner class below).
-
-//            ArrayList<Species> testiLista = new ArrayList<Species>(10);
-//            for (int i = 0;i < 10; i++) {
-//                if(i > 5) {
-//                    Species.SpeciesBuilder sb = new Species.SpeciesBuilder("Koira", 1);
-//                    sb.descr("Koira on myös kovis");
-//                    Species s = sb.build();
-//                    testiLista.add(i,s);
-//                } else {
-//                    Species.SpeciesBuilder sb = new Species.SpeciesBuilder("Kissa", 1);
-//                    sb.descr("Kissa on kovis");
-//                    Species s = sb.build();
-//                    testiLista.add(i, s);
-//                }
-//            }
 
             return ListFragment.newInstance(position + 1, speciesInSquare);
         }
@@ -302,5 +271,53 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void updateLocation() {
+        lkl = new LastKnownLocation(this.getApplicationContext(), this, new Runnable() {
+            // get called when location changes
+            @Override
+            public void run() {
+                Log.d(getClass().toString(), "location changed");
+                // get new location
+                Location loc = lkl.getLocation();
+                ((TextView)findViewById(R.id.testi_text)).setText(loc.getLatitude() + "," + loc.getLongitude());
+                // convert coordinate
+                int[] ykj = CoordinateConverter.WGSToYKJ(loc.getLatitude(), loc.getLongitude());
+                // only update list if in different grid square
+                if(lastLocation[0] != ykj[0] && lastLocation[1] != ykj[1]) {
+                    speciesInSquare = getSpeciesList(ykj[0], ykj[1]);
+                    mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+                    mViewPager = (ViewPager) findViewById(R.id.list_pager);
+                    mViewPager.setAdapter(mSectionsPagerAdapter);
+                    lastLocation = ykj;
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        lkl.connectAPI();
+        super.onStart();
+    }
+
+    public ArrayList<Species> getSpeciesList(int n, int e) {
+        Intent intent = getIntent();
+        ArrayList<Species> species = (ArrayList) intent.getSerializableExtra(MapsActivity.ARG_SPECIES_LIST);
+        if (species == null) {
+            ArrayList<Species> testiLista = new ArrayList<Species>(10);
+            for (int i = 0;i < 10; i++) {
+                if(i > 5) {
+                    Species s = new Species.SpeciesBuilder("Koira", 1).setWikiIdFin("612").build();
+                    testiLista.add(i,s);
+                } else {
+                    Species s = new Species.SpeciesBuilder("Kissa", 1).setWikiIdFin("7064").build();
+                    testiLista.add(i, s);
+                }
+            }
+            species = testiLista;
+        }
+        return species;
     }
 }

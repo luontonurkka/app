@@ -26,8 +26,8 @@ public class Loader extends AppCompatActivity {
         setContentView(R.layout.activity_loader);
 
         //not working as intented, take a closer look
-        LastKnownLocation asd = new LastKnownLocation(this,this);
-        final Location proop = asd.getLocation();
+        //LastKnownLocation asd = new LastKnownLocation(this,this);
+        //final Location proop = asd.getLocation();
 
 
         //reading grid csv to hashmap
