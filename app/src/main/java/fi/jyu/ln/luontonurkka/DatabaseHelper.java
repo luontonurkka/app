@@ -258,4 +258,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return c.getInt(c.getColumnIndex("id"));
     }
 
+    public ArrayList<Species> getSpeciesInSquare(int n, int e) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        int squareId = getSquare(n, e);
+
+        String[] tableColumns = new String[] {"id", "sid", "gid"};
+        String whereClause = "gid = ?";
+        String[] whereArgs = new String[] {Integer.toString(squareId)};
+        Cursor c = db.query("species_in_square", tableColumns, whereClause, whereArgs, null, null, null);
+
+        c.moveToFirst();
+
+
+
+        return null;
+    }
 }

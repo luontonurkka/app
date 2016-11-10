@@ -86,7 +86,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
 //            getSquare(690, 343, lnDb);
             int n = 690;
             int e = 343;
-//            speciesInSquare = myDbHelper.getSpeciesInSquare(n, e);
+            speciesInSquare = myDbHelper.getSpeciesInSquare(n, e);
 
 
         } catch (Exception ex) {
@@ -98,8 +98,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             } catch (Exception ex) {
                 ex.printStackTrace();
             } finally {
-                lnDb.close();
-                Log.d(getClass().toString(), "DB closed");
+                //
             }
         }
 
