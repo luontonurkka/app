@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -13,6 +14,7 @@ import android.support.v4.content.ContextCompat;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 /**
@@ -37,6 +39,9 @@ public class LastKnownLocation implements GoogleApiClient.ConnectionCallbacks, G
 
     /* LastKnownLocation Constant Permission */
     private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
+
+    private static final int GPS_MIN_UPDATE_TIME_MILLIS = 5000;
+    private static final float GPS_MIN_DIST_METERS = 100;
 
     /**
      * Constructor
@@ -99,6 +104,8 @@ public class LastKnownLocation implements GoogleApiClient.ConnectionCallbacks, G
 
         // Get last known location
         lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
+        LocationManager lm = (LocationManager)this.activity.getSystemService(Context.LOCATION_SERVICE);
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_MIN_UPDATE_TIME_MILLIS, GPS_MIN_DIST_METERS, this);
         locationChanged.run();
     }
 
