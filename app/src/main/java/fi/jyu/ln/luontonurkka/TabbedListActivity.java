@@ -281,9 +281,10 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                 Log.d(getClass().toString(), "location changed");
                 // get new location
                 Location loc = lkl.getLocation();
-                ((TextView)findViewById(R.id.testi_text)).setText(loc.getLatitude() + "," + loc.getLongitude());
                 // convert coordinate
                 int[] ykj = CoordinateConverter.WGSToYKJ(loc.getLatitude(), loc.getLongitude());
+                // TODO remove debug text
+                ((TextView)findViewById(R.id.testi_text)).setText(ykj[0] + "," + ykj[1] + " " + loc.getLatitude() + "," + loc.getLongitude());
                 // only update list if in different grid square
                 if(lastLocation[0] != ykj[0] && lastLocation[1] != ykj[1]) {
                     speciesInSquare = getSpeciesList(ykj[0], ykj[1]);
