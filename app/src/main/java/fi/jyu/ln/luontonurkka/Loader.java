@@ -1,5 +1,6 @@
 package fi.jyu.ln.luontonurkka;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.location.Location;
@@ -9,6 +10,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import java.io.BufferedReader;
@@ -17,6 +19,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 
 import fi.jyu.ln.luontonurkka.tools.GridParser;
+import fi.jyu.ln.luontonurkka.tools.SettingsManager;
 
 public class Loader extends AppCompatActivity {
 
@@ -24,11 +27,6 @@ public class Loader extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loader);
-
-        //not working as intented, take a closer look
-        //LastKnownLocation asd = new LastKnownLocation(this,this);
-        //final Location proop = asd.getLocation();
-
 
         //reading grid csv to hashmap
         GridParser p = new GridParser();
@@ -41,20 +39,22 @@ public class Loader extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        final Intent intent1 = new Intent(this, TabbedListActivity.class);
-        //intent1.putExtra("species_list",);
+        SettingsManager sm = new SettingsManager(this);
+        Log.d(getClass().toString(), sm.getBool(getString(R.string.setting_map_default)) + "");
+        final Intent intent;
+        if(sm.getBool(getString(R.string.setting_map_default))) {
+            intent = new Intent(this, MapsActivity.class);
+        } else {
+            intent = new Intent(this, TabbedListActivity.class);
+        }
 
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                //remember to .putextra all stuff for a working listview
-                //presumably a hashmap of grids.
-                startActivity(intent1);
+                startActivity(intent);
                 finish();
             }
-        }, 10000);
-
-
+        }, 3000);
     }
 }
