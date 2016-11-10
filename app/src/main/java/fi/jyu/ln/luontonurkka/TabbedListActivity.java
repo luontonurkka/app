@@ -4,6 +4,8 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -68,6 +70,37 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                }
             }
             speciesInSquare = testiLista;
+        }
+
+        //create database helper and initialize database if needed
+        DatabaseHelper myDbHelper = DatabaseHelper.getInstance(this);
+        Log.d(getClass().toString(), "DB helper opened");
+        myDbHelper.initializeDataBase();
+        Log.d(getClass().toString(), "DB initialized");
+//        SQLiteDatabase lnDb = null;
+        try {
+            // A reference to the database can be obtained after initialization.
+//            lnDb = myDbHelper.getWritableDatabase();
+//            Log.d(getClass().toString(), "DB opened");
+//
+//            getSquare(690, 343, lnDb);
+            int n = 690;
+            int e = 343;
+//            speciesInSquare = myDbHelper.getSpeciesInSquare(n, e);
+
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                myDbHelper.close();
+                Log.d(getClass().toString(), "DB helper closed");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            } finally {
+                lnDb.close();
+                Log.d(getClass().toString(), "DB closed");
+            }
         }
 
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

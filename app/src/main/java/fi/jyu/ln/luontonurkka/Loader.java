@@ -27,44 +27,28 @@ public class Loader extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loader);
 
+        /*
+         * create database helper and initialize the database
+         */
         DatabaseHelper myDbHelper;
-        SQLiteDatabase myDb = null;
-
-        myDbHelper = new DatabaseHelper(this);
+        myDbHelper = DatabaseHelper.getInstance(this);
+        Log.d(getClass().toString(), "DB helper opened");
         /*
          * Database must be initialized before it can be used. This will ensure
          * that the database exists and is the current version.
          */
         myDbHelper.initializeDataBase();
+        Log.d(getClass().toString(), "DB initialized");
+        myDbHelper.close();
+        Log.d(getClass().toString(), "DB helper closed");
 
-        try {
-            // A reference to the database can be obtained after initialization.
-            myDb = myDbHelper.getWritableDatabase();
-            /*
-             * Place code to use database here.
-             */
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            try {
-                myDbHelper.close();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            } finally {
-                myDb.close();
-            }
-        }
-
-        final Intent intent1 = new Intent(this, TabbedListActivity.class);
-        //intent1.putExtra("species_list",);
+        final Intent intent = new Intent(this, TabbedListActivity.class);
 
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                //remember to .putextra all stuff for a working listview
-                //presumably a hashmap of grids.
-                startActivity(intent1);
+                startActivity(intent);
                 finish();
             }
         }, 10000);

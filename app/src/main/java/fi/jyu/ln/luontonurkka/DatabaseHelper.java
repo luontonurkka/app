@@ -1,6 +1,7 @@
 package fi.jyu.ln.luontonurkka;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -8,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 /**
  * Created by sinikka on 7.11.2016.
@@ -15,13 +17,15 @@ import java.io.OutputStream;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
+    private static DatabaseHelper sInstance;
+
     /*
      * The Android's default system path of the application database in internal
      * storage. The package of the application is part of the path of the
      * directory.
      */
     private static String DB_DIR = "/data/data/fi.jyu.ln.luontonurkka/databases/";
-    private static String DB_NAME = "test_db.sqlite";
+    private static String DB_NAME = "LuontonurkkaDB.db";
     private static String DB_PATH = DB_DIR + DB_NAME;
     private static String OLD_DB_PATH = DB_DIR + "old_" + DB_NAME;
 
@@ -30,13 +34,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private boolean createDatabase = false;
     private boolean upgradeDatabase = false;
 
+    public static synchronized DatabaseHelper getInstance(Context context) {
+
+        // Use the application context, which will ensure that you
+        // don't accidentally leak an Activity's context.
+        // See this article for more information: http://bit.ly/6LRzfx
+        if (sInstance == null) {
+            sInstance = new DatabaseHelper(context.getApplicationContext());
+        }
+        return sInstance;
+    }
+
     /**
-     * Constructor Takes and keeps a reference of the passed context in order to
-     * access to the application assets and resources.
-     *
-     * @param context
+     * Constructor should be private to prevent direct instantiation.
+     * make call to static method "getInstance()" instead.
      */
-    public DatabaseHelper(Context context) {
+    private DatabaseHelper(Context context) {
         super(context, DB_NAME, null, context.getResources().getInteger(
                 R.integer.databaseVersion));
         myContext = context;
@@ -231,5 +244,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * "return myDataBase.query(....)" so it'd be easy to you to create adapters
      * for your views.
      */
+
+    public int getSquare(int n, int e) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        String[] tableColumns = new String[] {"id", "N", "E"};
+        String whereClause = "N = ? AND E = ?";
+        String[] whereArgs = new String[] {Integer.toString(n), Integer.toString(e)};
+        Cursor c = db.query("grid", tableColumns, whereClause, whereArgs, null, null, null);
+
+        c.moveToFirst();
+
+        return c.getInt(c.getColumnIndex("id"));
+    }
 
 }
