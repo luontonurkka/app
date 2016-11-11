@@ -245,7 +245,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * for your views.
      */
 
-    public int getSquare(int n, int e) {
+    private int getSquare(int n, int e) {
         SQLiteDatabase db = getWritableDatabase();
 
         String[] tableColumns = new String[] {"id", "N", "E"};
@@ -268,10 +268,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String[] whereArgs = new String[] {Integer.toString(squareId)};
         Cursor c = db.query("species_in_square", tableColumns, whereClause, whereArgs, null, null, null);
 
-        c.moveToFirst();
+        ArrayList<Species> speciesInSquare = new ArrayList<Species>();
+        Species s = null;
+        if (c.moveToNext()) {
+            int speciesId = c.getInt(c.getColumnIndex("sid"));
+            s = getSpeciesById(speciesId);
+            speciesInSquare.add(s);
+        }
 
+        return speciesInSquare;
+    }
 
+    private Species getSpeciesById(int speciesId) {
+        SQLiteDatabase db = getWritableDatabase();
 
-        return null;
+        String[] tableColumns = new String[] {"id", "namelatin", "type", "idEN", "idFI"};
+        String whereClause = "id = ?";
+        String[] whereArgs = new String[] {Integer.toString(speciesId)};
+        Cursor c = db.query("species", tableColumns, whereClause, whereArgs, null, null, null);
+
+        c.moveToNext();
+
+        return new Species.SpeciesBuilder(
+                c.getString(c.getColumnIndex("namelatin")),
+                c.getInt(c.getColumnIndex("type")))
+                .setWikiIdFin(Integer.toString(c.getInt(c.getColumnIndex("idFI"))))
+                .setWikiIdEng(Integer.toString(c.getInt(c.getColumnIndex("idEN"))))
+                .build();
     }
 }
