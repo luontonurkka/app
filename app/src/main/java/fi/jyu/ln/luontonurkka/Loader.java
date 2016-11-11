@@ -45,7 +45,6 @@ public class Loader extends AppCompatActivity {
         Log.d(getClass().toString(), "DB helper closed");
 
         SettingsManager sm = new SettingsManager(this);
-        Log.d(getClass().toString(), sm.getBool(getString(R.string.setting_map_default)) + "");
         final Intent intent;
         if(sm.getBool(getString(R.string.setting_map_default))) {
             intent = new Intent(this, MapsActivity.class);
