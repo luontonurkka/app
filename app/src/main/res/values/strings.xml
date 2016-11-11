@@ -19,7 +19,6 @@
     <string name="map_default">Karttanäkymä aloitussivuna</string>
     <string name="night_theme">Yö teema</string>
 
-
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_loader">Loader</string>
     <string name="title_activity_loading">Loading</string>
