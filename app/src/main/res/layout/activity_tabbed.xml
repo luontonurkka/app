@@ -30,6 +30,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <TextView
+                    android:text="testi"
+                    android:id="@+id/testi_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
                 <ImageButton
                     android:layout_marginTop="8dp"
                     android:layout_marginLeft="@dimen/text_margin_half"

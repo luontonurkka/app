@@ -26,46 +26,50 @@ public class CustomNavigationView extends NavigationView {
 
         View headerView = getHeaderView(0);
 
-        sm = new SettingsManager((Activity) context);
+        if(!isInEditMode()) {
+            sm = new SettingsManager((Activity) context);
 
-        final String nightSettingsString = context.getString(R.string.setting_night_theme);
-        Switch nightSwitch = (Switch)headerView.findViewById(R.id.switch_night);
-        boolean nightTheme = sm.getBool(nightSettingsString);
-        if(nightTheme) {
-            nightSwitch.toggle();
-        }
-        nightSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                sm.setBool(nightSettingsString, isChecked);
+            final String nightSettingsString = context.getString(R.string.setting_night_theme);
+            Switch nightSwitch = (Switch) headerView.findViewById(R.id.switch_night);
+            boolean nightTheme = sm.getBool(nightSettingsString);
+            if (nightTheme) {
+                nightSwitch.toggle();
             }
-        });
+            nightSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    sm.setBool(nightSettingsString, isChecked);
+                }
+            });
 
-        final String gpsSettingsString = context.getString(R.string.setting_disable_gps);
-        Switch gpsSwitch = (Switch)headerView.findViewById(R.id.switch_gps);
-        boolean gps = sm.getBool(gpsSettingsString);
-        if(gps) {
-            gpsSwitch.toggle();
-        }
-        gpsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                sm.setBool(gpsSettingsString, isChecked);
+            final String gpsSettingsString = context.getString(R.string.setting_disable_gps);
+            Switch gpsSwitch = (Switch) headerView.findViewById(R.id.switch_gps);
+            boolean gps = sm.getBool(gpsSettingsString);
+            if (gps) {
+                gpsSwitch.toggle();
             }
-        });
+            gpsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    sm.setBool(gpsSettingsString, isChecked);
+                }
+            });
 
-        final String mapSettingsString = context.getString(R.string.setting_map_default);
-        Switch mapSwitch = (Switch)headerView.findViewById(R.id.switch_map);
-        boolean mapDefault = sm.getBool(mapSettingsString);
-        if(mapDefault) {
-            mapSwitch.toggle();
-        }
-        mapSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                sm.setBool(mapSettingsString, isChecked);
+            final String mapSettingsString = context.getString(R.string.setting_map_default);
+            Switch mapSwitch = (Switch) headerView.findViewById(R.id.switch_map);
+            boolean mapDefault = sm.getBool(mapSettingsString);
+            if (mapDefault) {
+                mapSwitch.toggle();
             }
-        });
+            mapSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    sm.setBool(mapSettingsString, isChecked);
+                }
+            });
+        } else {
+            sm = null;
+        }
     }
 
     public SettingsManager getSettingsManager() {

@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -12,6 +14,7 @@ import android.support.v4.content.ContextCompat;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 /**
@@ -26,24 +29,29 @@ import com.google.android.gms.location.LocationServices;
  * Created by Sinikka Siironen on 18.10.2016.
  */
 
-public class LastKnownLocation implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class LastKnownLocation implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private GoogleApiClient apiClient;
     private android.content.Context context;
     private android.app.Activity activity;
     private android.location.Location lastLocation;
+    private Runnable locationChanged;
 
     /* LastKnownLocation Constant Permission */
     private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
+
+    private static final int GPS_MIN_UPDATE_TIME_MILLIS = 5000;
+    private static final float GPS_MIN_DIST_METERS = 100;
 
     /**
      * Constructor
      * @param context Activity's context
      * @param activity Activity which creates LastKnownLocation instance
      */
-    public LastKnownLocation(Context context, Activity activity) {
+    public LastKnownLocation(Context context, Activity activity, Runnable locationChanged) {
         this.context = context;
         this.activity = activity;
+        this.locationChanged = locationChanged;
         // Create an instance of GoogleAPIClient to get device location.
         buildGoogleApiClient();
     }
@@ -96,6 +104,9 @@ public class LastKnownLocation implements GoogleApiClient.ConnectionCallbacks, G
 
         // Get last known location
         lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
+        LocationManager lm = (LocationManager)this.activity.getSystemService(Context.LOCATION_SERVICE);
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_MIN_UPDATE_TIME_MILLIS, GPS_MIN_DIST_METERS, this);
+        locationChanged.run();
     }
 
     /**
@@ -119,5 +130,26 @@ public class LastKnownLocation implements GoogleApiClient.ConnectionCallbacks, G
         // the failure silently
 
         // ...
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        lastLocation = location;
+        locationChanged.run();
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
     }
 }
