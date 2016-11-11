@@ -21,6 +21,7 @@
 
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_loader">Loader</string>
+    <string name="title_activity_loading">Loading</string>
     <string name = "loading_text">Ladataan, pieni hetki</string>
 
     <item type="integer" name="databaseVersion" format="integer">1</item>

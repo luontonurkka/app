@@ -1,5 +1,6 @@
 package fi.jyu.ln.luontonurkka;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
@@ -19,6 +20,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 
 import fi.jyu.ln.luontonurkka.tools.GridParser;
+import fi.jyu.ln.luontonurkka.tools.SettingsManager;
 
 public class Loader extends AppCompatActivity {
 
@@ -43,6 +45,25 @@ public class Loader extends AppCompatActivity {
         Log.d(getClass().toString(), "DB helper closed");
 
         final Intent intent = new Intent(this, TabbedListActivity.class);
+        //reading grid csv to hashmap
+        GridParser p = new GridParser();
+        InputStream is = getResources().openRawResource(R.raw.grid_sorted);
+        p.openFile(is);
+        try {
+            HashMap<String, String> grid = p.parseFile();
+            p.closeFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        SettingsManager sm = new SettingsManager(this);
+        Log.d(getClass().toString(), sm.getBool(getString(R.string.setting_map_default)) + "");
+        final Intent intent;
+        if(sm.getBool(getString(R.string.setting_map_default))) {
+            intent = new Intent(this, MapsActivity.class);
+        } else {
+            intent = new Intent(this, TabbedListActivity.class);
+        }
 
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -51,8 +72,6 @@ public class Loader extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             }
-        }, 10000);
-
-
+        }, 3000);
     }
 }

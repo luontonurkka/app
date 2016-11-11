@@ -14,8 +14,7 @@ public class SettingsManager {
     private SharedPreferences sp;
 
     public SettingsManager(Activity activity) {
-        PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
-        sp = activity.getPreferences(Context.MODE_PRIVATE);
+        sp = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
     }
 
     public void setBool(String preference, boolean bool) {
