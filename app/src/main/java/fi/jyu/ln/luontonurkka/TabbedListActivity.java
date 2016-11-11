@@ -58,48 +58,38 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         //get intent
         Intent intent = getIntent();
         speciesInSquare = (ArrayList) intent.getSerializableExtra(MapsActivity.ARG_SPECIES_LIST);
-        if (speciesInSquare == null) {
-            ArrayList<Species> testiLista = new ArrayList<Species>(10);
-            for (int i = 0;i < 10; i++) {
-               if(i > 5) {
-                    Species s = new Species.SpeciesBuilder("Koira", 1).setWikiIdFin("612").build();
-                    testiLista.add(i,s);
-                } else {
-                    Species s = new Species.SpeciesBuilder("Kissa", 1).setWikiIdFin("7064").build();
-                    testiLista.add(i, s);
-               }
-            }
-            speciesInSquare = testiLista;
-        }
 
         //create database helper and initialize database if needed
         DatabaseHelper myDbHelper = DatabaseHelper.getInstance(this);
-        Log.d(getClass().toString(), "DB helper opened");
         myDbHelper.initializeDataBase();
-        Log.d(getClass().toString(), "DB initialized");
-//        SQLiteDatabase lnDb = null;
         try {
-            // A reference to the database can be obtained after initialization.
-//            lnDb = myDbHelper.getWritableDatabase();
-//            Log.d(getClass().toString(), "DB opened");
-//
-//            getSquare(690, 343, lnDb);
+            //example square
             int n = 690;
             int e = 343;
             speciesInSquare = myDbHelper.getSpeciesInSquare(n, e);
-
-
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
             try {
                 myDbHelper.close();
-                Log.d(getClass().toString(), "DB helper closed");
             } catch (Exception ex) {
                 ex.printStackTrace();
-            } finally {
-                //
             }
+        }
+
+        // If species in square is null, create an example list
+        if (speciesInSquare == null) {
+            ArrayList<Species> testiLista = new ArrayList<Species>(10);
+            for (int i = 0;i < 10; i++) {
+                if(i > 5) {
+                    Species s = new Species.SpeciesBuilder("Koira", 1).setWikiIdFin("612").build();
+                    testiLista.add(i,s);
+                } else {
+                    Species s = new Species.SpeciesBuilder("Kissa", 1).setWikiIdFin("7064").build();
+                    testiLista.add(i, s);
+                }
+            }
+            speciesInSquare = testiLista;
         }
 
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

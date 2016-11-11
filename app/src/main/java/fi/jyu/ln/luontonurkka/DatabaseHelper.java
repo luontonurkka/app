@@ -259,38 +259,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         super.onOpen(db);
     }
 
-    /*
-     * Add your public helper methods to access and get content from the
-     * database. You could return cursors by doing
-     * "return myDataBase.query(....)" so it'd be easy to you to create adapters
-     * for your views.
-     */
-
+    /**
+     * Get square id from database according to coordinates.
+     * @param n North YKJ coordinate
+     * @param e East YKJ coordinate
+     * @return square id in database
+      */
     private int getSquare(int n, int e) {
-        SQLiteDatabase db = getWritableDatabase();
-
         String[] tableColumns = new String[] {KEY_ID, KEY_NORTH, KEY_EAST};
         String whereClause = KEY_NORTH + " = ? AND " + KEY_EAST + " = ?";
         String[] whereArgs = new String[] {Integer.toString(n), Integer.toString(e)};
+
         int squareId = 0;
-        try (Cursor c = db.query(TABLE_GRID, tableColumns, whereClause, whereArgs, null, null, null);) {
+        try (SQLiteDatabase db = getWritableDatabase(); Cursor c = db.query(TABLE_GRID, tableColumns, whereClause, whereArgs, null, null, null);) {
             c.moveToFirst();
             squareId = c.getInt(c.getColumnIndex(KEY_ID));
         }
         return squareId;
     }
 
+    /**
+     * Get all species in a square
+     * @param n Squares north YKJ coordinate
+     * @param e Squares east YKJ coordinate
+     * @return List of species in square
+     */
     public ArrayList<Species> getSpeciesInSquare(int n, int e) {
-        SQLiteDatabase db = getWritableDatabase();
-
-        int squareId = getSquare(n, e);
-
         String[] tableColumns = new String[] {KEY_ID, KEY_SPEC_ID, KEY_SQ_ID};
         String whereClause = KEY_SQ_ID + " = ?";
-        String[] whereArgs = new String[] {Integer.toString(squareId)};
+        String[] whereArgs = new String[] {Integer.toString(getSquare(n, e))};
 
         ArrayList<Species> speciesInSquare = new ArrayList<Species>();
-        try (Cursor c = db.query(TABLE_SPEC_IN_SQ, tableColumns, whereClause, whereArgs, null, null, null);) {
+        try (SQLiteDatabase db = getWritableDatabase(); Cursor c = db.query(TABLE_SPEC_IN_SQ, tableColumns, whereClause, whereArgs, null, null, null);) {
             Species s;
 
             while (c.moveToNext()) {
@@ -302,14 +302,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return speciesInSquare;
     }
 
+    /**
+     * Get species information from database according to id
+     * @param speciesId Id of the species
+     * @return A species object
+     */
     private Species getSpeciesById(int speciesId) {
-        SQLiteDatabase db = getWritableDatabase();
-
         String[] tableColumns = new String[] {KEY_ID, KEY_NAME_LATIN, KEY_TYPE, KEY_WIKI_EN, KEY_WIKI_FI};
         String whereClause = KEY_ID + " = ?";
         String[] whereArgs = new String[] {Integer.toString(speciesId)};
+
         Species s;
-        try (Cursor c = db.query(TABLE_SPECIES, tableColumns, whereClause, whereArgs, null, null, null);) {
+        try (SQLiteDatabase db = getWritableDatabase(); Cursor c = db.query(TABLE_SPECIES, tableColumns, whereClause, whereArgs, null, null, null);) {
             c.moveToNext();
             s = new Species.SpeciesBuilder(
                     c.getString(c.getColumnIndex(KEY_NAME_LATIN)),
