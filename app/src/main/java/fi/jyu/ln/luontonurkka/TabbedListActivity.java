@@ -32,6 +32,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
@@ -68,25 +69,9 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
 
         //get intent
         Intent intent = getIntent();
-        speciesInSquare = (ArrayList) intent.getSerializableExtra(MapsActivity.ARG_SPECIES_LIST);
 
-        //create database helper and initialize database if needed
-        DatabaseHelper myDbHelper = DatabaseHelper.getInstance(this);
-        myDbHelper.initializeDataBase();
-        try {
-            //example square
-            int n = 690;
-            int e = 343;
-            speciesInSquare = myDbHelper.getSpeciesInSquare(n, e);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            try {
-                myDbHelper.close();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
+        //TODO Decide on default coordinates
+        getSpeciesList(intent.getDoubleExtra(MapsActivity.ARG_NORTH_COORD, 62.2141), intent.getDoubleExtra(MapsActivity.ARG_EAST_COORD, 25.7126));
 
         // If species in square is null, create an example list
         if (speciesInSquare == null) {
@@ -336,7 +321,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                 ((TextView)findViewById(R.id.testi_text)).setText(ykj[0] + "," + ykj[1] + " " + loc.getLatitude() + "," + loc.getLongitude());
                 // only update list if in different grid square
                 if(lastLocation[0] != ykj[0] && lastLocation[1] != ykj[1]) {
-                    speciesInSquare = getSpeciesList(ykj[0], ykj[1]);
+                    speciesInSquare = getSpeciesList(loc.getLatitude(), loc.getLongitude());
                     mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
                     mViewPager = (ViewPager) findViewById(R.id.list_pager);
                     mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -352,22 +337,29 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         super.onStart();
     }
 
-    public ArrayList<Species> getSpeciesList(int n, int e) {
-        Intent intent = getIntent();
-        ArrayList<Species> species = (ArrayList) intent.getSerializableExtra(MapsActivity.ARG_SPECIES_LIST);
-        if (species == null) {
-            ArrayList<Species> testiLista = new ArrayList<Species>(10);
-            for (int i = 0;i < 10; i++) {
-                if(i > 5) {
-                    Species s = new Species.SpeciesBuilder("Koira", 1).setWikiIdFin("612").build();
-                    testiLista.add(i,s);
-                } else {
-                    Species s = new Species.SpeciesBuilder("Kissa", 1).setWikiIdFin("7064").build();
-                    testiLista.add(i, s);
-                }
+    /**
+     * Get list of species in square
+     * @param n North WGS coordinate
+     * @param e East WGS coordinate
+     * @return List of species in square
+     */
+    public ArrayList<Species> getSpeciesList(double n, double e) {
+        //create database helper and initialize database if needed
+        DatabaseHelper myDbHelper = DatabaseHelper.getInstance(this);
+        myDbHelper.initializeDataBase();
+        try {
+            int[] ykjCoord = CoordinateConverter.WGSToYKJ(n, e);
+            speciesInSquare = myDbHelper.getSpeciesInSquare(ykjCoord[0]/10000, ykjCoord[1]/10000);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                myDbHelper.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-            species = testiLista;
         }
-        return species;
+
+        return speciesInSquare;
     }
 }
