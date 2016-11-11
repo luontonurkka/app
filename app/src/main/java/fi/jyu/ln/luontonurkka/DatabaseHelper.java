@@ -29,6 +29,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static String DB_PATH = DB_DIR + DB_NAME;
     private static String OLD_DB_PATH = DB_DIR + "old_" + DB_NAME;
 
+    //Database element names:
+    //Tables
+    private static String TABLE_SPECIES = "species";
+    private static String TABLE_GRID = "grid";
+    private static String TABLE_SPEC_IN_SQ = "species_in_square";
+
+    //Table columns
+    private static String KEY_ID = "id";
+    private static String KEY_SQ_ID = "gid";
+    private static String KEY_SPEC_ID = "sid";
+    private static String KEY_NORTH = "N";
+    private static String KEY_EAST = "E";
+    private static String KEY_NAME_LATIN = "namelatin";
+    private static String KEY_NAME_FIN = "namefin";
+    private static String KEY_TYPE = "type";
+    private static String KEY_PIC = "picture";
+    private static String KEY_WIKI_EN = "idEN";
+    private static String KEY_WIKI_FI = "idFI";
+    private static String KEY_FREQ = "freq";
+
+
     private final Context myContext;
 
     private boolean createDatabase = false;
@@ -248,13 +269,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private int getSquare(int n, int e) {
         SQLiteDatabase db = getWritableDatabase();
 
-        String[] tableColumns = new String[] {"id", "N", "E"};
-        String whereClause = "N = ? AND E = ?";
+        String[] tableColumns = new String[] {KEY_ID, KEY_NORTH, KEY_EAST};
+        String whereClause = KEY_NORTH + " = ? AND " + KEY_EAST + " = ?";
         String[] whereArgs = new String[] {Integer.toString(n), Integer.toString(e)};
         int squareId = 0;
-        try (Cursor c = db.query("grid", tableColumns, whereClause, whereArgs, null, null, null);) {
+        try (Cursor c = db.query(TABLE_GRID, tableColumns, whereClause, whereArgs, null, null, null);) {
             c.moveToFirst();
-            squareId = c.getInt(c.getColumnIndex("id"));
+            squareId = c.getInt(c.getColumnIndex(KEY_ID));
         }
         return squareId;
     }
@@ -264,16 +285,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         int squareId = getSquare(n, e);
 
-        String[] tableColumns = new String[] {"id", "sid", "gid"};
-        String whereClause = "gid = ?";
+        String[] tableColumns = new String[] {KEY_ID, KEY_SPEC_ID, KEY_SQ_ID};
+        String whereClause = KEY_SQ_ID + " = ?";
         String[] whereArgs = new String[] {Integer.toString(squareId)};
 
         ArrayList<Species> speciesInSquare = new ArrayList<Species>();
-        try (Cursor c = db.query("species_in_square", tableColumns, whereClause, whereArgs, null, null, null);) {
+        try (Cursor c = db.query(TABLE_SPEC_IN_SQ, tableColumns, whereClause, whereArgs, null, null, null);) {
             Species s;
 
             while (c.moveToNext()) {
-                s = getSpeciesById(c.getInt(c.getColumnIndex("sid")));
+                s = getSpeciesById(c.getInt(c.getColumnIndex(KEY_SPEC_ID)));
                 speciesInSquare.add(s);
             }
         }
@@ -284,17 +305,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private Species getSpeciesById(int speciesId) {
         SQLiteDatabase db = getWritableDatabase();
 
-        String[] tableColumns = new String[] {"id", "namelatin", "type", "idEN", "idFI"};
-        String whereClause = "id = ?";
+        String[] tableColumns = new String[] {KEY_ID, KEY_NAME_LATIN, KEY_TYPE, KEY_WIKI_EN, KEY_WIKI_FI};
+        String whereClause = KEY_ID + " = ?";
         String[] whereArgs = new String[] {Integer.toString(speciesId)};
         Species s;
-        try (Cursor c = db.query("species", tableColumns, whereClause, whereArgs, null, null, null);) {
+        try (Cursor c = db.query(TABLE_SPECIES, tableColumns, whereClause, whereArgs, null, null, null);) {
             c.moveToNext();
             s = new Species.SpeciesBuilder(
-                    c.getString(c.getColumnIndex("namelatin")),
-                    c.getInt(c.getColumnIndex("type")))
-                    .setWikiIdFin(Integer.toString(c.getInt(c.getColumnIndex("idFI"))))
-                    .setWikiIdEng(Integer.toString(c.getInt(c.getColumnIndex("idEN"))))
+                    c.getString(c.getColumnIndex(KEY_NAME_LATIN)),
+                    c.getInt(c.getColumnIndex(KEY_TYPE)))
+                    .setWikiIdFin(Integer.toString(c.getInt(c.getColumnIndex(KEY_WIKI_FI))))
+                    .setWikiIdEng(Integer.toString(c.getInt(c.getColumnIndex(KEY_WIKI_EN))))
                     .build();
         }
 
