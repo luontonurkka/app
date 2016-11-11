@@ -44,18 +44,6 @@ public class Loader extends AppCompatActivity {
         myDbHelper.close();
         Log.d(getClass().toString(), "DB helper closed");
 
-        final Intent intent = new Intent(this, TabbedListActivity.class);
-        //reading grid csv to hashmap
-        GridParser p = new GridParser();
-        InputStream is = getResources().openRawResource(R.raw.grid_sorted);
-        p.openFile(is);
-        try {
-            HashMap<String, String> grid = p.parseFile();
-            p.closeFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         SettingsManager sm = new SettingsManager(this);
         Log.d(getClass().toString(), sm.getBool(getString(R.string.setting_map_default)) + "");
         final Intent intent;
