@@ -251,11 +251,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String[] tableColumns = new String[] {"id", "N", "E"};
         String whereClause = "N = ? AND E = ?";
         String[] whereArgs = new String[] {Integer.toString(n), Integer.toString(e)};
-        Cursor c = db.query("grid", tableColumns, whereClause, whereArgs, null, null, null);
-
-        c.moveToFirst();
-
-        return c.getInt(c.getColumnIndex("id"));
+        int squareId = 0;
+        try (Cursor c = db.query("grid", tableColumns, whereClause, whereArgs, null, null, null);) {
+            c.moveToFirst();
+            squareId = c.getInt(c.getColumnIndex("id"));
+        }
+        return squareId;
     }
 
     public ArrayList<Species> getSpeciesInSquare(int n, int e) {
@@ -266,14 +267,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String[] tableColumns = new String[] {"id", "sid", "gid"};
         String whereClause = "gid = ?";
         String[] whereArgs = new String[] {Integer.toString(squareId)};
-        Cursor c = db.query("species_in_square", tableColumns, whereClause, whereArgs, null, null, null);
 
         ArrayList<Species> speciesInSquare = new ArrayList<Species>();
-        Species s = null;
-        if (c.moveToNext()) {
-            int speciesId = c.getInt(c.getColumnIndex("sid"));
-            s = getSpeciesById(speciesId);
-            speciesInSquare.add(s);
+        try (Cursor c = db.query("species_in_square", tableColumns, whereClause, whereArgs, null, null, null);) {
+            Species s;
+
+            while (c.moveToNext()) {
+                s = getSpeciesById(c.getInt(c.getColumnIndex("sid")));
+                speciesInSquare.add(s);
+            }
         }
 
         return speciesInSquare;
@@ -285,15 +287,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String[] tableColumns = new String[] {"id", "namelatin", "type", "idEN", "idFI"};
         String whereClause = "id = ?";
         String[] whereArgs = new String[] {Integer.toString(speciesId)};
-        Cursor c = db.query("species", tableColumns, whereClause, whereArgs, null, null, null);
+        Species s;
+        try (Cursor c = db.query("species", tableColumns, whereClause, whereArgs, null, null, null);) {
+            c.moveToNext();
+            s = new Species.SpeciesBuilder(
+                    c.getString(c.getColumnIndex("namelatin")),
+                    c.getInt(c.getColumnIndex("type")))
+                    .setWikiIdFin(Integer.toString(c.getInt(c.getColumnIndex("idFI"))))
+                    .setWikiIdEng(Integer.toString(c.getInt(c.getColumnIndex("idEN"))))
+                    .build();
+        }
 
-        c.moveToNext();
-
-        return new Species.SpeciesBuilder(
-                c.getString(c.getColumnIndex("namelatin")),
-                c.getInt(c.getColumnIndex("type")))
-                .setWikiIdFin(Integer.toString(c.getInt(c.getColumnIndex("idFI"))))
-                .setWikiIdEng(Integer.toString(c.getInt(c.getColumnIndex("idEN"))))
-                .build();
+        return s;
     }
 }
