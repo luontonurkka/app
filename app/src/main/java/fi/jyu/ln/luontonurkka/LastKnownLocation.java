@@ -39,6 +39,7 @@ public class LastKnownLocation implements GoogleApiClient.ConnectionCallbacks, G
 
     /* LastKnownLocation Constant Permission */
     private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
+    private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 22;
 
     private static final int GPS_MIN_UPDATE_TIME_MILLIS = 5000;
     private static final float GPS_MIN_DIST_METERS = 100;
@@ -100,6 +101,11 @@ public class LastKnownLocation implements GoogleApiClient.ConnectionCallbacks, G
         // Check for the permission to access coarse location
         if ( ContextCompat.checkSelfPermission( context, Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
             ActivityCompat.requestPermissions( activity, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION }, MY_PERMISSION_ACCESS_COARSE_LOCATION );
+        }
+
+        // Check for the permission to access fine location
+        if ( ContextCompat.checkSelfPermission( context, Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+            ActivityCompat.requestPermissions( activity, new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, MY_PERMISSION_ACCESS_FINE_LOCATION );
         }
 
         // Get last known location
