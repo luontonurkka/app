@@ -282,24 +282,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Get all species in a square
      * @param n Squares north YKJ coordinate
      * @param e Squares east YKJ coordinate
-     * @return List of species in square
+     * @return SpeciesLists object containing separate lists
      */
-    public ArrayList<Species> getSpeciesInSquare(int n, int e) {
+    public SpeciesLists getSpeciesInSquare(int n, int e) {
         String[] tableColumns = new String[] {KEY_ID, KEY_SPEC_ID, KEY_SQ_ID};
         String whereClause = KEY_SQ_ID + " = ?";
         String[] whereArgs = new String[] {Integer.toString(getSquare(n, e))};
 
-        ArrayList<Species> speciesInSquare = new ArrayList<Species>();
+        ArrayList<Species> birdsInSquare = new ArrayList<Species>();
+        ArrayList<Species> plantsInSquare = new ArrayList<Species>();
         try (SQLiteDatabase db = getWritableDatabase(); Cursor c = db.query(TABLE_SPEC_IN_SQ, tableColumns, whereClause, whereArgs, null, null, null);) {
             Species s;
 
             while (c.moveToNext()) {
                 s = getSpeciesById(c.getInt(c.getColumnIndex(KEY_SPEC_ID)));
-                speciesInSquare.add(s);
+                if (s.getType() == Species.BIRD) {
+                    birdsInSquare.add(s);
+                }
+                else {
+                    plantsInSquare.add(s);
+                }
             }
         }
 
-        return speciesInSquare;
+        return new SpeciesLists(birdsInSquare, plantsInSquare);
     }
 
     /**

@@ -40,7 +40,7 @@ import fi.jyu.ln.luontonurkka.tools.CoordinateConverter;
 
 public class TabbedListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static ArrayList<Species> speciesInSquare;
+    private static SpeciesLists speciesInSquare;
     private int[] lastLocation = {0,0};
 
     private LastKnownLocation lkl;
@@ -85,7 +85,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                     testiLista.add(i, s);
                 }
             }
-            speciesInSquare = testiLista;
+//            speciesInSquare = testiLista;
         }
 
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -186,7 +186,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             // getItem is called to instantiate the fragment for the given page.
             // Return a ListFragment (defined as a static inner class below).
 
-            return ListFragment.newInstance(position + 1, speciesInSquare);
+            return ListFragment.newInstance(position + 1, speciesInSquare.getBirds());
         }
 
         @Override
@@ -343,7 +343,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
      * @param e East WGS coordinate
      * @return List of species in square
      */
-    public ArrayList<Species> getSpeciesList(double n, double e) {
+    public SpeciesLists getSpeciesList(double n, double e) {
         //create database helper and initialize database if needed
         DatabaseHelper myDbHelper = DatabaseHelper.getInstance(this);
         myDbHelper.initializeDataBase();
