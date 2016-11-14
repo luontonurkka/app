@@ -314,15 +314,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @return A species object
      */
     private Species getSpeciesById(int speciesId) {
-        String[] tableColumns = new String[] {KEY_ID, KEY_NAME_LATIN, KEY_TYPE, KEY_WIKI_EN, KEY_WIKI_FI};
+        String[] tableColumns = new String[] {KEY_ID, KEY_NAME_LATIN, KEY_NAME_FIN, KEY_TYPE, KEY_WIKI_EN, KEY_WIKI_FI};
         String whereClause = KEY_ID + " = ?";
         String[] whereArgs = new String[] {Integer.toString(speciesId)};
 
         Species s;
         try (SQLiteDatabase db = getWritableDatabase(); Cursor c = db.query(TABLE_SPECIES, tableColumns, whereClause, whereArgs, null, null, null);) {
             c.moveToNext();
+            String name = c.getString(c.getColumnIndex(KEY_NAME_FIN));
+            if (name.isEmpty() || name == null) {
+                name = c.getString(c.getColumnIndex(KEY_NAME_LATIN));
+            }
             s = new Species.SpeciesBuilder(
-                    c.getString(c.getColumnIndex(KEY_NAME_LATIN)),
+                    name,
+//                    c.getString(c.getColumnIndex(KEY_NAME_LATIN)),
                     c.getInt(c.getColumnIndex(KEY_TYPE)))
                     .setWikiIdFin(Integer.toString(c.getInt(c.getColumnIndex(KEY_WIKI_FI))))
                     .setWikiIdEng(Integer.toString(c.getInt(c.getColumnIndex(KEY_WIKI_EN))))

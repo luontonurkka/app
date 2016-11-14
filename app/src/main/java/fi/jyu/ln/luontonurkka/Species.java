@@ -11,11 +11,11 @@ import java.io.Serializable;
 public class Species implements Serializable {
 
     /*
-    1 = bird
-    2 = plant
+    1 = plant
+    2 = bird
      */
-    public static final int BIRD = 1;
-    public static final int PLANT = 2;
+    public static final int PLANT = 1;
+    public static final int BIRD = 2;
 
     private final String name;      //required
     private final int type;         //required

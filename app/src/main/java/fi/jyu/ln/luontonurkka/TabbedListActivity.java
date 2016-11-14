@@ -70,8 +70,12 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         //get intent
         Intent intent = getIntent();
 
-        //TODO Decide on default coordinates
-        getSpeciesList(intent.getDoubleExtra(MapsActivity.ARG_NORTH_COORD, 62.2141), intent.getDoubleExtra(MapsActivity.ARG_EAST_COORD, 25.7126));
+        //if list view was opened from map activity
+        if (intent.getBooleanExtra(MapsActivity.FROM_MAP_VIEW, false)) {
+            lastLocation = CoordinateConverter.WGSToYKJ(intent.getDoubleExtra(MapsActivity.ARG_NORTH_COORD, 62.2141), intent.getDoubleExtra(MapsActivity.ARG_EAST_COORD, 25.7126));
+            //TODO Decide on default coordinates
+            speciesInSquare = getSpeciesList(intent.getDoubleExtra(MapsActivity.ARG_NORTH_COORD, 62.2141), intent.getDoubleExtra(MapsActivity.ARG_EAST_COORD, 25.7126));
+        }
 
         // If species in square is null, create an example list
         if (speciesInSquare == null) {
@@ -92,7 +96,9 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         //setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        if (speciesInSquare != null) {
+            mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        }
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.list_pager);
@@ -186,7 +192,15 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             // getItem is called to instantiate the fragment for the given page.
             // Return a ListFragment (defined as a static inner class below).
 
-            return ListFragment.newInstance(position + 1, speciesInSquare.getBirds());
+            if (position == 1) {
+                return ListFragment.newInstance(position, speciesInSquare.getBirds());
+            }
+            else if (position == 2) {
+                return ListFragment.newInstance(position, speciesInSquare.getPlants());
+            }
+            else {
+                return ListFragment.newInstance(position, speciesInSquare.getAll());
+            }
         }
 
         @Override
