@@ -32,7 +32,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected static final String ARG_EAST_COORD = "earth_coord";
     protected static final String FROM_MAP_VIEW = "from_map_view";
     /* LastKnownLocation Constant Permission */
-    private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 11;
+    private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +57,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
 
-        // Check for the permission to access fine location
-        if ( ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
-            ActivityCompat.requestPermissions(this, new String[] { android.Manifest.permission.ACCESS_FINE_LOCATION }, MY_PERMISSION_ACCESS_FINE_LOCATION);
+        // Check for the permission to access coarse location
+        if ( ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+            ActivityCompat.requestPermissions(this, new String[] { android.Manifest.permission.ACCESS_COARSE_LOCATION }, MY_PERMISSION_ACCESS_COARSE_LOCATION);
         }
+        
+        // Check for the permission to access fine location
+//        if ( ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+//            ActivityCompat.requestPermissions(this, new String[] { android.Manifest.permission.ACCESS_FINE_LOCATION }, MY_PERMISSION_ACCESS_FINE_LOCATION);
+//        }
         map.setMyLocationEnabled(true);
 
         //Luontonurkka hq
@@ -120,7 +125,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onConnected(Bundle connectionHint) {
         // Check for the permission to access fine location
         if ( ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
-            ActivityCompat.requestPermissions(this, new String[] { android.Manifest.permission.ACCESS_FINE_LOCATION }, MY_PERMISSION_ACCESS_FINE_LOCATION);
+            ActivityCompat.requestPermissions(this, new String[] { android.Manifest.permission.ACCESS_FINE_LOCATION }, MY_PERMISSION_ACCESS_COARSE_LOCATION);
         }
 
         // Get last known location
