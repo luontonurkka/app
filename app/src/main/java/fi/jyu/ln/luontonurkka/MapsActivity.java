@@ -135,7 +135,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        map.clear();
 //        locationMarker = map.addMarker(new MarkerOptions()
 //                .position(loc));
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, 17));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, 10));
     }
 
     /**
