@@ -64,8 +64,11 @@ public class SpeciesActivity extends AppCompatActivity {
         layout.setCollapsedTitleTextColor(Color.WHITE);
 
         String id = species.getIdFin();
-        if(id.length() < 1)
+        String lang = "fi";
+        if(id.length() < 1) {
             id = species.getIdEng();
+            lang = "en";
+        }
 
         OnTaskCompleted task = new OnTaskCompleted() {
             @Override
@@ -82,11 +85,10 @@ public class SpeciesActivity extends AppCompatActivity {
                     setImgComplete(result);
             }
         };
-        WikiFetcher.getWikiDescription(id, task, "fi");
+        WikiFetcher.getWikiDescription(id, task, lang);
 
-        new DownloadImageTask(task).execute("https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_March_2010-1.jpg");
-
-
+        if (species.getImgUrl().length() > 0)
+            new DownloadImageTask(task).execute(species.getImgUrl());
     }
 
     protected void openWikiPage(String pageId) {
@@ -96,33 +98,24 @@ public class SpeciesActivity extends AppCompatActivity {
 
     private void setTextComplete(String text) {
         speciesDesc = text;
-        checkLoadingComplete();
+        TextView textView = (TextView)findViewById(R.id.species_content_text);
+        if(speciesDesc.length() > DESCRIPTION_LENGTH)
+            speciesDesc = speciesDesc.substring(0,DESCRIPTION_LENGTH) + "...";
+        textView.setText(speciesDesc);
+
+        ProgressBar loadingBar = (ProgressBar)findViewById(R.id.species_loading);
+        Button wikiButton = (Button)findViewById(R.id.species_content_button_wiki);
+
+        loadingBar.setVisibility(View.INVISIBLE);
+
+        wikiButton.setVisibility(View.VISIBLE);
+        textView.setVisibility(View.VISIBLE);
     }
 
     private void setImgComplete(Bitmap img) {
         speciesImg = img;
-        checkLoadingComplete();
-    }
-
-    private void checkLoadingComplete() {
-        if(speciesImg != null && speciesDesc != null) {
-
-            TextView textView = (TextView)findViewById(R.id.species_content_text);
-            if(speciesDesc.length() > DESCRIPTION_LENGTH)
-                speciesDesc = speciesDesc.substring(0,DESCRIPTION_LENGTH) + "...";
-            textView.setText(speciesDesc);
-
-            ImageView imgView = (ImageView)findViewById(R.id.species_toolbar_img);
-            imgView.setImageBitmap(speciesImg);
-
-            ProgressBar loadingBar = (ProgressBar)findViewById(R.id.species_loading);
-            Button wikiButton = (Button)findViewById(R.id.species_content_button_wiki);
-
-            loadingBar.setVisibility(View.INVISIBLE);
-
-            wikiButton.setVisibility(View.VISIBLE);
-            textView.setVisibility(View.VISIBLE);
-            imgView.setVisibility(View.VISIBLE);
-        }
+        ImageView imgView = (ImageView)findViewById(R.id.species_toolbar_img);
+        imgView.setImageBitmap(speciesImg);
+        imgView.setVisibility(View.VISIBLE);
     }
 }
