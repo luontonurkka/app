@@ -34,6 +34,8 @@ public class SpeciesActivity extends AppCompatActivity {
 
     private String speciesDesc;
     private Bitmap speciesImg;
+    private String pageId;
+    private String lang;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,10 +54,10 @@ public class SpeciesActivity extends AppCompatActivity {
         layout.setCollapsedTitleTextColor(Color.WHITE);
 
         // TODO ids wrongway around
-        String id = species.getIdEng();
-        String lang = "fi";
-        if(id.length() < 1) {
-            id = species.getIdFin();
+        pageId = species.getIdEng();
+        lang = "fi";
+        if(pageId.length() < 1) {
+            pageId = species.getIdFin();
             lang = "en";
         }
 
@@ -72,14 +74,14 @@ public class SpeciesActivity extends AppCompatActivity {
                     setImgComplete(result);
             }
         };
-        WikiFetcher.getWikiDescription(id, task, lang);
+        WikiFetcher.getWikiDescription(pageId, task, lang);
 
         if (species.getImgUrl().length() > 0)
             new DownloadImageTask(task).execute(species.getImgUrl());
     }
 
-    protected void openWikiPage(String pageId) {
-        Intent wikiIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://fi.wikipedia.org/?curid=" + pageId));
+    protected void openWikiPage(View view) {
+        Intent wikiIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://" + lang + ".wikipedia.org/?curid=" + pageId));
         startActivity(wikiIntent);
     }
 
