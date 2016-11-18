@@ -46,6 +46,8 @@ public class Species implements Serializable {
     public String getIdEng() { return idEng; }
     public String getIdFin() { return idFin; }
 
+    public String getImgUrl() { return imgUrl; }
+
     public static class SpeciesBuilder {
         private final String name;      //required
         private final int type;         //required
