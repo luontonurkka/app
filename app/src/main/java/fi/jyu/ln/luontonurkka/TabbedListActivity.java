@@ -1,49 +1,62 @@
 package fi.jyu.ln.luontonurkka;
 
-import android.app.ActionBar;
-import android.app.FragmentTransaction;
+import android.*;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.AsyncTask;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
-
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.GridLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
 
 import fi.jyu.ln.luontonurkka.tools.CoordinateConverter;
 
-public class TabbedListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class TabbedListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private static SpeciesLists speciesInSquare;
-    private int[] lastLocation = {0,0};
+    private int[] lastLocationYKJ = {0,0};
 
-    private LastKnownLocation lkl;
+//    private LastKnownLocation lkl;
+
+    private GoogleApiClient apiClient;
+    private android.location.Location lastLocation;
+//    private Runnable locationChanged;
+
+    /* Location Constant Permissions */
+    private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
+    private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 22;
+
+    /* Location update parameters */
+    private static final int GPS_MIN_UPDATE_TIME_MILLIS = 5000;
+    private static final float GPS_MIN_DIST_METERS = 100;
+
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -65,14 +78,17 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabbed);
 
-        updateLocation();
+        /**
+         * Build the Google API Client to get the device location
+         */
+        buildGoogleApiClient();
 
         //get intent
         Intent intent = getIntent();
 
         //if list view was opened from map activity
         if (intent.getBooleanExtra(MapsActivity.FROM_MAP_VIEW, false)) {
-            lastLocation = CoordinateConverter.WGSToYKJ(intent.getDoubleExtra(MapsActivity.ARG_NORTH_COORD, 62.2141), intent.getDoubleExtra(MapsActivity.ARG_EAST_COORD, 25.7126));
+            lastLocationYKJ = CoordinateConverter.WGSToYKJ(intent.getDoubleExtra(MapsActivity.ARG_NORTH_COORD, 62.2141), intent.getDoubleExtra(MapsActivity.ARG_EAST_COORD, 25.7126));
             //TODO Decide on default coordinates
             speciesInSquare = getSpeciesList(intent.getDoubleExtra(MapsActivity.ARG_NORTH_COORD, 62.2141), intent.getDoubleExtra(MapsActivity.ARG_EAST_COORD, 25.7126));
         }
@@ -321,35 +337,142 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         return true;
     }
 
-    public void updateLocation() {
-        lkl = new LastKnownLocation(this.getApplicationContext(), this, new Runnable() {
-            // get called when location changes
-            @Override
-            public void run() {
-                Log.d(getClass().toString(), "location changed");
-                // get new location
-                Location loc = lkl.getLocation();
-                // convert coordinate
-                int[] ykj = CoordinateConverter.WGSToYKJ(loc.getLatitude(), loc.getLongitude());
-                // TODO remove debug text
-                ((TextView)findViewById(R.id.testi_text)).setText(ykj[0] + "," + ykj[1] + " " + loc.getLatitude() + "," + loc.getLongitude());
-                // only update list if in different grid square
-                if(lastLocation[0] != ykj[0] && lastLocation[1] != ykj[1]) {
-                    speciesInSquare = getSpeciesList(loc.getLatitude(), loc.getLongitude());
-                    mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-                    mViewPager = (ViewPager) findViewById(R.id.list_pager);
-                    mViewPager.setAdapter(mSectionsPagerAdapter);
-                    lastLocation = ykj;
-                }
-            }
-        });
+
+    /**
+     *
+     * Location updating
+     *
+     */
+
+    /**
+     * Builds a GoogleAPIClient.
+     */
+    protected synchronized void buildGoogleApiClient() {
+        apiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
     }
 
     @Override
     protected void onStart() {
-        lkl.connectAPI();
+        apiClient.connect();
         super.onStart();
     }
+
+    @Override
+    protected void onStop() {
+        apiClient.disconnect();
+        super.onStop();
+    }
+
+    /**
+     * Runs when Google API Client is connected.
+     * @param connectionHint
+     */
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        // Check for the permission to access coarse location
+        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+            ActivityCompat.requestPermissions( this, new String[] { android.Manifest.permission.ACCESS_COARSE_LOCATION }, MY_PERMISSION_ACCESS_COARSE_LOCATION );
+        }
+
+        // Check for the permission to access fine location
+        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+            ActivityCompat.requestPermissions( this, new String[] { android.Manifest.permission.ACCESS_FINE_LOCATION }, MY_PERMISSION_ACCESS_FINE_LOCATION );
+        }
+
+        // Get last known location
+        lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
+        LocationManager lm = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_MIN_UPDATE_TIME_MILLIS, GPS_MIN_DIST_METERS, this);
+//        locationChanged.run();
+    }
+
+    /**
+     * Connection to Google API Client was lost.
+     * @param i
+     */
+    @Override
+    public void onConnectionSuspended(int i) {
+        // The connection to Google Play services was lost for some reason. We call connect() to
+        // attempt to re-establish the connection.
+        apiClient.connect();
+    }
+
+    /**
+     * If connection to Google API Client fails (can't get location)
+     */
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        // An unresolvable error has occurred and a connection to Google APIs
+        // could not be established. Display an error message, or handle
+        // the failure silently
+
+        // ...
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.d(getClass().toString(), "location changed");
+        // store new location
+        if (location != null) {
+            lastLocation = location;
+        }
+        // convert coordinate
+        int[] ykj = CoordinateConverter.WGSToYKJ(lastLocation.getLatitude(), lastLocation.getLongitude());
+        // TODO remove debug text
+        ((TextView)findViewById(R.id.testi_text)).setText(ykj[0] + "," + ykj[1] + " " + lastLocation.getLatitude() + "," + lastLocation.getLongitude());
+        // only update list if in different grid square
+        if(lastLocationYKJ[0] != ykj[0] && lastLocationYKJ[1] != ykj[1]) {
+            speciesInSquare = getSpeciesList(lastLocation.getLatitude(), lastLocation.getLongitude());
+            mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+            mViewPager = (ViewPager) findViewById(R.id.list_pager);
+            mViewPager.setAdapter(mSectionsPagerAdapter);
+            lastLocationYKJ = ykj;
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+//    public void updateLocation() {
+//        lkl = new LastKnownLocation(this.getApplicationContext(), this, new Runnable() {
+//            // get called when location changes
+//            @Override
+//            public void run() {
+//                Log.d(getClass().toString(), "location changed");
+//                // get new location
+//                Location loc = lkl.getLocation();
+//                // convert coordinate
+//                int[] ykj = CoordinateConverter.WGSToYKJ(loc.getLatitude(), loc.getLongitude());
+//                // TODO remove debug text
+//                ((TextView)findViewById(R.id.testi_text)).setText(ykj[0] + "," + ykj[1] + " " + loc.getLatitude() + "," + loc.getLongitude());
+//                // only update list if in different grid square
+//                if(lastLocationYKJ[0] != ykj[0] && lastLocationYKJ[1] != ykj[1]) {
+//                    speciesInSquare = getSpeciesList(loc.getLatitude(), loc.getLongitude());
+//                    mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+//                    mViewPager = (ViewPager) findViewById(R.id.list_pager);
+//                    mViewPager.setAdapter(mSectionsPagerAdapter);
+//                    lastLocationYKJ = ykj;
+//                }
+//            }
+//        });
+//    }
+
 
     /**
      * Get list of species in square
