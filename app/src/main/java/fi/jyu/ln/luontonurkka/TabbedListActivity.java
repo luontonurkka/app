@@ -1,21 +1,25 @@
 package fi.jyu.ln.luontonurkka;
 
-import android.*;
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -31,43 +35,69 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 
 import java.util.ArrayList;
 
 import fi.jyu.ln.luontonurkka.tools.CoordinateConverter;
 
-public class TabbedListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class TabbedListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<LocationSettingsResult>, com.google.android.gms.location.LocationListener {
 
     private static SpeciesLists speciesInSquare;
-    private int[] lastLocationYKJ = {0,0};
-
+    private int[] lastLocationYKJ = {0, 0};
 //    private LastKnownLocation lkl;
 
     private GoogleApiClient apiClient;
-    private android.location.Location lastLocation;
-//    private Runnable locationChanged;
 
+    private Location lastLocation;
     /* Location Constant Permissions */
     private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
-    private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 22;
 
+    private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 22;
     /* Location update parameters */
     private static final int GPS_MIN_UPDATE_TIME_MILLIS = 5000;
-    private static final float GPS_MIN_DIST_METERS = 100;
 
+    private static final float GPS_MIN_DIST_METERS = 100;
+    /* Stores parameters for requests to the FusedLocationProviderApi. */
+    protected LocationRequest locationRequest;
 
     /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
+     * Stores the types of location services the client is interested in using. Used for checking
+     * settings to determine if the device has optimal location settings.
+     */
+    protected LocationSettingsRequest locationSettingsRequest;
+
+    /* Tracks the status of the location updates request. */
+    protected Boolean requestingLocationUpdates;
+
+    /* Constant used in the location settings dialog. */
+    protected static final int REQUEST_CHECK_SETTINGS = 0x1;
+
+    /**
+     * Resolving error in connecting to Google API Client state
+     */
+    private boolean resolvingError;
+    private static final int REQUEST_RESOLVE_ERROR = 77;
+
+    /**
+     * The {@link PagerAdapter} that will provide
      * fragments for each of the sections. We use a
      * {@link FragmentPagerAdapter} derivative, which will keep every
      * loaded fragment in memory. If this becomes too memory intensive, it
      * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     * {@link FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-
     /**
      * The {@link ViewPager} that will host the section contents.
      */
@@ -78,10 +108,13 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabbed);
 
-        /**
-         * Build the Google API Client to get the device location
-         */
+        //Requesting for location updates
+        requestingLocationUpdates = true;
+        //Build the Google API Client, LocationRequest and LocationSettingsRequest
         buildGoogleApiClient();
+        createLocationRequest();
+        buildLocationSettingsRequest();
+        checkLocationSettings();
 
         //get intent
         Intent intent = getIntent();
@@ -96,10 +129,10 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         // If species in square is null, create an example list
         if (speciesInSquare == null) {
             ArrayList<Species> testiLista = new ArrayList<Species>(10);
-            for (int i = 0;i < 10; i++) {
-                if(i > 5) {
+            for (int i = 0; i < 10; i++) {
+                if (i > 5) {
                     Species s = new Species.SpeciesBuilder("Koira", 1).setWikiIdFin("612").build();
-                    testiLista.add(i,s);
+                    testiLista.add(i, s);
                 } else {
                     Species s = new Species.SpeciesBuilder("Kissa", 1).setWikiIdFin("7064").build();
                     testiLista.add(i, s);
@@ -157,7 +190,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             SpeciesListAdapter sla = new SpeciesListAdapter(container.getContext(), speciesList);
             //SpeciesListAdapter sla = new SpeciesListAdapter(container.getContext(), speciesInSquare);
 
-            ListView listView = (ListView)rootView.findViewById(R.id.species_list);
+            ListView listView = (ListView) rootView.findViewById(R.id.species_list);
             listView.setAdapter(sla);
 
             return rootView;
@@ -169,23 +202,23 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             Context context;
 
             public SpeciesListAdapter(Context context, ArrayList<Species> speciesList) {
-                super(context,R.layout.specieslistobject_layout,speciesList);
+                super(context, R.layout.specieslistobject_layout, speciesList);
                 this.speciesList = speciesList;
                 this.context = context;
             }
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
-                final Species species = (Species)getItem(position);
-                LayoutInflater inflater = (LayoutInflater)context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
+                final Species species = (Species) getItem(position);
+                LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
                 final View row = inflater.inflate(R.layout.specieslistobject_layout, null, true);
-                TextView textView = (TextView)row.findViewById(R.id.list_name);
+                TextView textView = (TextView) row.findViewById(R.id.list_name);
                 textView.setText(species.getName());
-                Button button = (Button)row.findViewById(R.id.list_button);
+                Button button = (Button) row.findViewById(R.id.list_button);
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ((TabbedListActivity)row.getContext()).openSpeciesView(species);
+                        ((TabbedListActivity) row.getContext()).openSpeciesView(species);
                     }
                 });
                 return row;
@@ -210,11 +243,9 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
 
             if (position == 1) {
                 return ListFragment.newInstance(position, speciesInSquare.getBirds());
-            }
-            else if (position == 2) {
+            } else if (position == 2) {
                 return ListFragment.newInstance(position, speciesInSquare.getPlants());
-            }
-            else {
+            } else {
                 return ListFragment.newInstance(position, speciesInSquare.getAll());
             }
         }
@@ -241,7 +272,8 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
 
     /**
      * Opens the species view activity.
-     * @param species   Species object on which more info will be shown
+     *
+     * @param species Species object on which more info will be shown
      */
     protected void openSpeciesView(Species species) {
 
@@ -264,7 +296,8 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
 
     /**
      * Shows settings drawer. Called from three vertical lines button.
-     * @param view  View that calling the method
+     *
+     * @param view View that calling the method
      */
     public void showDrawer(View view) {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -286,7 +319,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
     }
 
     public void showTab(int index) {
-        ViewPager pager = (ViewPager)findViewById(R.id.list_pager);
+        ViewPager pager = (ViewPager) findViewById(R.id.list_pager);
         pager.setCurrentItem(index);
     }
 
@@ -355,6 +388,110 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                 .build();
     }
 
+    /**
+     * Sets up the location request. Android has two location request settings:
+     * {@code ACCESS_COARSE_LOCATION} and {@code ACCESS_FINE_LOCATION}. These settings control
+     * the accuracy of the current location. This sample uses ACCESS_FINE_LOCATION, as defined in
+     * the AndroidManifest.xml.
+     * <p/>
+     * When the ACCESS_FINE_LOCATION setting is specified, combined with a fast update
+     * interval (5 seconds), the Fused Location Provider API returns location updates that are
+     * accurate to within a few feet.
+     * <p/>
+     * These settings are appropriate for mapping applications that show real-time location
+     * updates.
+     */
+    protected void createLocationRequest() {
+        locationRequest = new LocationRequest();
+
+        // Sets the desired interval for active location updates. This interval is
+        // inexact. You may not receive updates at all if no location sources are available, or
+        // you may receive them slower than requested. You may also receive updates faster than
+        // requested if other applications are requesting location at a faster interval.
+        locationRequest.setInterval(GPS_MIN_UPDATE_TIME_MILLIS);
+
+        locationRequest.setSmallestDisplacement(GPS_MIN_DIST_METERS);
+    }
+
+    /**
+     * Uses a {@link com.google.android.gms.location.LocationSettingsRequest.Builder} to build
+     * a {@link com.google.android.gms.location.LocationSettingsRequest} that is used for checking
+     * if a device has the needed location settings.
+     */
+    protected void buildLocationSettingsRequest() {
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        builder.addLocationRequest(locationRequest);
+        locationSettingsRequest = builder.build();
+    }
+
+    /**
+     * Check if the device's location settings are adequate for the app's needs using the
+     * {@link com.google.android.gms.location.SettingsApi#checkLocationSettings(GoogleApiClient,
+     * LocationSettingsRequest)} method, with the results provided through a {@code PendingResult}.
+     */
+    protected void checkLocationSettings() {
+        PendingResult<LocationSettingsResult> result =
+                LocationServices.SettingsApi.checkLocationSettings(
+                        apiClient,
+                        locationSettingsRequest
+                );
+        result.setResultCallback(this);
+    }
+
+    /**
+     * The callback invoked when
+     * {@link com.google.android.gms.location.SettingsApi#checkLocationSettings(GoogleApiClient,
+     * LocationSettingsRequest)} is called. Examines the
+     * {@link com.google.android.gms.location.LocationSettingsResult} object and determines if
+     * location settings are adequate. If they are not, begins the process of presenting a location
+     * settings dialog to the user.
+     */
+    @Override
+    public void onResult(LocationSettingsResult locationSettingsResult) {
+        final Status status = locationSettingsResult.getStatus();
+        switch (status.getStatusCode()) {
+            case LocationSettingsStatusCodes.SUCCESS:
+                Log.i(this.getLocalClassName(), "All location settings are satisfied.");
+                startLocationUpdates();
+                break;
+            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                Log.i(this.getLocalClassName(), "Location settings are not satisfied. Show the user a dialog to" +
+                        "upgrade location settings ");
+
+                try {
+                    // Show the dialog by calling startResolutionForResult(), and check the result
+                    // in onActivityResult().
+                    status.startResolutionForResult(TabbedListActivity.this, REQUEST_CHECK_SETTINGS);
+                } catch (IntentSender.SendIntentException e) {
+                    Log.i(this.getLocalClassName(), "PendingIntent unable to execute request.");
+                }
+                break;
+            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                Log.i(this.getLocalClassName(), "Location settings are inadequate, and cannot be fixed here. Dialog " +
+                        "not created.");
+                break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            // Check for the integer request code originally supplied to startResolutionForResult().
+            case REQUEST_CHECK_SETTINGS:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        Log.i(this.getLocalClassName(), "User agreed to make required location settings changes.");
+                        startLocationUpdates();
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        Log.i(this.getLocalClassName(), "User chose not to make required location settings changes.");
+                        //TODO Käyttäjä ei antanut lupaa sijaintiin, näytä kartta?
+                        break;
+                }
+                break;
+        }
+    }
+
     @Override
     protected void onStart() {
         apiClient.connect();
@@ -367,42 +504,128 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         super.onStop();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Within {@code onPause()}, we pause location updates, but leave the
+        // connection to GoogleApiClient intact.  Here, we resume receiving
+        // location updates if the user has requested them.
+        if (apiClient.isConnected() && requestingLocationUpdates) {
+            startLocationUpdates();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Stop location updates to save battery, but don't disconnect the GoogleApiClient object.
+        if (apiClient.isConnected()) {
+            stopLocationUpdates();
+        }
+    }
+
+    /**
+     * Requests location updates from the FusedLocationApi.
+     */
+    protected void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                apiClient,
+                locationRequest,
+                this
+        ).setResultCallback(new ResultCallback<Status>() {
+            @Override
+            public void onResult(Status status) {
+                requestingLocationUpdates = true;
+            }
+        });
+
+    }
+
+    /**
+     * Removes location updates from the FusedLocationApi.
+     */
+    protected void stopLocationUpdates() {
+        // It is a good practice to remove location requests when the activity is in a paused or
+        // stopped state. Doing so helps battery performance and is especially
+        // recommended in applications that request frequent location updates.
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                apiClient,
+                this
+        ).setResultCallback(new ResultCallback<Status>() {
+            @Override
+            public void onResult(Status status) {
+                requestingLocationUpdates = false;
+            }
+        });
+    }
+
     /**
      * Runs when Google API Client is connected.
+     *
      * @param connectionHint
      */
     @Override
     public void onConnected(Bundle connectionHint) {
-        // Check for the permission to access coarse location
-        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
-            ActivityCompat.requestPermissions( this, new String[] { android.Manifest.permission.ACCESS_COARSE_LOCATION }, MY_PERMISSION_ACCESS_COARSE_LOCATION );
+        Log.i(this.getLocalClassName(), "Connected to GoogleApiClient");
+
+        // If the initial location was never previously requested, we use
+        // FusedLocationApi.getLastLocation() to get it.
+        if (lastLocation == null) {
+            // Ask user for permission to use coarse location
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[] { android.Manifest.permission.ACCESS_COARSE_LOCATION }, MY_PERMISSION_ACCESS_COARSE_LOCATION);
+            }
+            // Get last location
+            lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
+            updateLocation();
         }
 
-        // Check for the permission to access fine location
-        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
-            ActivityCompat.requestPermissions( this, new String[] { android.Manifest.permission.ACCESS_FINE_LOCATION }, MY_PERMISSION_ACCESS_FINE_LOCATION );
-        }
-
-        // Get last known location
-        lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
-        LocationManager lm = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_MIN_UPDATE_TIME_MILLIS, GPS_MIN_DIST_METERS, this);
-//        locationChanged.run();
+//        // Check for the permission to access coarse location
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSION_ACCESS_COARSE_LOCATION);
+//        }
+//
+//        // Check for the permission to access fine location
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_ACCESS_FINE_LOCATION);
+//        }
+//
+//        // Get last known location
+//        lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
+//        LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+//        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_MIN_UPDATE_TIME_MILLIS, GPS_MIN_DIST_METERS, this);
+////        locationChanged.run();
     }
 
+
+
     /**
-     * Connection to Google API Client was lost.
-     * @param i
+     * Connection to Google API Client was lost, try to connect again.
      */
     @Override
     public void onConnectionSuspended(int i) {
         // The connection to Google Play services was lost for some reason. We call connect() to
         // attempt to re-establish the connection.
+        Log.i(this.getLocalClassName(), "Connection suspended");
         apiClient.connect();
     }
 
+
+
     /**
-     * If connection to Google API Client fails (can't get location)
+     * If connection to Google API Client fails (can't get location), try to resolve the error
+     * and show user an error dialog.
      */
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
@@ -410,72 +633,99 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         // could not be established. Display an error message, or handle
         // the failure silently
 
-        // ...
+       Log.i(this.getLocalClassName(), "Connection failed: ConnectionResult.getErrorCode() = " + connectionResult.getErrorCode());
+
+        if (resolvingError) {
+            // Already attempting to resolve an error.
+            return;
+        } else if (connectionResult.hasResolution()) {
+            try {
+                resolvingError = true;
+                connectionResult.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
+            } catch (IntentSender.SendIntentException e) {
+                // There was an error with the resolution intent. Try again.
+                apiClient.connect();
+            }
+        } else {
+            // Show dialog using GooglePlayServicesUtil.getErrorDialog()
+            showErrorDialog(connectionResult.getErrorCode());
+            resolvingError = true;
+        }
     }
+
+    /* Creates a dialog for an error message */
+    private void showErrorDialog(int errorCode) {
+        // Create a fragment for the error dialog
+        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
+        // Pass the error that should be displayed
+        Bundle args = new Bundle();
+        args.putInt("dialog_error", errorCode);
+        dialogFragment.setArguments(args);
+        dialogFragment.show(getSupportFragmentManager(), "errordialog");
+    }
+
+    /* Called from ErrorDialogFragment when the dialog is dismissed. */
+    public void onDialogDismissed() {
+        resolvingError = false;
+    }
+
+    /* A fragment to display an error dialog */
+    public static class ErrorDialogFragment extends DialogFragment {
+        public ErrorDialogFragment() { }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Get the error code and retrieve the appropriate dialog
+            int errorCode = this.getArguments().getInt("dialog_error");
+            return GoogleApiAvailability.getInstance().getErrorDialog(
+                    this.getActivity(), errorCode, REQUEST_RESOLVE_ERROR);
+        }
+
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            ((TabbedListActivity) getActivity()).onDialogDismissed();
+        }
+    }
+
+
+
+    /*
+     * On location changed
+     */
 
     @Override
     public void onLocationChanged(Location location) {
         Log.d(getClass().toString(), "location changed");
-        // store new location
         if (location != null) {
             lastLocation = location;
         }
-        // convert coordinate
-        int[] ykj = CoordinateConverter.WGSToYKJ(lastLocation.getLatitude(), lastLocation.getLongitude());
-        // TODO remove debug text
-        ((TextView)findViewById(R.id.testi_text)).setText(ykj[0] + "," + ykj[1] + " " + lastLocation.getLatitude() + "," + lastLocation.getLongitude());
-        // only update list if in different grid square
-        if(lastLocationYKJ[0] != ykj[0] && lastLocationYKJ[1] != ykj[1]) {
-            speciesInSquare = getSpeciesList(lastLocation.getLatitude(), lastLocation.getLongitude());
-            mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-            mViewPager = (ViewPager) findViewById(R.id.list_pager);
-            mViewPager.setAdapter(mSectionsPagerAdapter);
-            lastLocationYKJ = ykj;
+        updateLocation();
+    }
+
+    /**
+     * Update species list when location is updated
+     */
+    public void updateLocation() {
+        if (lastLocation != null) {
+            // convert coordinate
+            int[] ykj = CoordinateConverter.WGSToYKJ(lastLocation.getLatitude(), lastLocation.getLongitude());
+            // TODO remove debug text
+            ((TextView) findViewById(R.id.testi_text)).setText(ykj[0] + "," + ykj[1] + " " + lastLocation.getLatitude() + "," + lastLocation.getLongitude());
+            // only update list if in different grid square
+            if (lastLocationYKJ[0] != ykj[0] && lastLocationYKJ[1] != ykj[1]) {
+                speciesInSquare = getSpeciesList(lastLocation.getLatitude(), lastLocation.getLongitude());
+                mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+                mViewPager = (ViewPager) findViewById(R.id.list_pager);
+                mViewPager.setAdapter(mSectionsPagerAdapter);
+                lastLocationYKJ = ykj;
+            }
         }
     }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
-
-//    public void updateLocation() {
-//        lkl = new LastKnownLocation(this.getApplicationContext(), this, new Runnable() {
-//            // get called when location changes
-//            @Override
-//            public void run() {
-//                Log.d(getClass().toString(), "location changed");
-//                // get new location
-//                Location loc = lkl.getLocation();
-//                // convert coordinate
-//                int[] ykj = CoordinateConverter.WGSToYKJ(loc.getLatitude(), loc.getLongitude());
-//                // TODO remove debug text
-//                ((TextView)findViewById(R.id.testi_text)).setText(ykj[0] + "," + ykj[1] + " " + loc.getLatitude() + "," + loc.getLongitude());
-//                // only update list if in different grid square
-//                if(lastLocationYKJ[0] != ykj[0] && lastLocationYKJ[1] != ykj[1]) {
-//                    speciesInSquare = getSpeciesList(loc.getLatitude(), loc.getLongitude());
-//                    mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-//                    mViewPager = (ViewPager) findViewById(R.id.list_pager);
-//                    mViewPager.setAdapter(mSectionsPagerAdapter);
-//                    lastLocationYKJ = ykj;
-//                }
-//            }
-//        });
-//    }
 
 
     /**
      * Get list of species in square
+     *
      * @param n North WGS coordinate
      * @param e East WGS coordinate
      * @return List of species in square
@@ -486,7 +736,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         myDbHelper.initializeDataBase();
         try {
             int[] ykjCoord = CoordinateConverter.WGSToYKJ(n, e);
-            speciesInSquare = myDbHelper.getSpeciesInSquare(ykjCoord[0]/10000, ykjCoord[1]/10000);
+            speciesInSquare = myDbHelper.getSpeciesInSquare(ykjCoord[0] / 10000, ykjCoord[1] / 10000);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
