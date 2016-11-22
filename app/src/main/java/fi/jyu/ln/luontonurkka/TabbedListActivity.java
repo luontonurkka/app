@@ -1,5 +1,6 @@
 package fi.jyu.ln.luontonurkka;
 
+import android.*;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -11,13 +12,13 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -36,7 +37,6 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -63,11 +63,11 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
     /* Location Constant Permissions */
     private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
 
-    private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 22;
     /* Location update parameters */
     private static final int GPS_MIN_UPDATE_TIME_MILLIS = 5000;
 
     private static final float GPS_MIN_DIST_METERS = 100;
+
     /* Stores parameters for requests to the FusedLocationProviderApi. */
     protected LocationRequest locationRequest;
 
@@ -362,7 +362,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         int id = item.getItemId();
 
         if (id == R.id.nav_share) {
-
+            //
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -393,21 +393,15 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
      * {@code ACCESS_COARSE_LOCATION} and {@code ACCESS_FINE_LOCATION}. These settings control
      * the accuracy of the current location. This sample uses ACCESS_FINE_LOCATION, as defined in
      * the AndroidManifest.xml.
-     * <p/>
      * When the ACCESS_FINE_LOCATION setting is specified, combined with a fast update
      * interval (5 seconds), the Fused Location Provider API returns location updates that are
      * accurate to within a few feet.
-     * <p/>
      * These settings are appropriate for mapping applications that show real-time location
      * updates.
      */
     protected void createLocationRequest() {
         locationRequest = new LocationRequest();
 
-        // Sets the desired interval for active location updates. This interval is
-        // inexact. You may not receive updates at all if no location sources are available, or
-        // you may receive them slower than requested. You may also receive updates faster than
-        // requested if other applications are requesting location at a faster interval.
         locationRequest.setInterval(GPS_MIN_UPDATE_TIME_MILLIS);
 
         locationRequest.setSmallestDisplacement(GPS_MIN_DIST_METERS);
@@ -457,22 +451,25 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                 Log.i(this.getLocalClassName(), "Location settings are not satisfied. Show the user a dialog to" +
                         "upgrade location settings ");
-
                 try {
-                    // Show the dialog by calling startResolutionForResult(), and check the result
-                    // in onActivityResult().
+                    // Show the dialog by calling startResolutionForResult(), and check the result in onActivityResult().
                     status.startResolutionForResult(TabbedListActivity.this, REQUEST_CHECK_SETTINGS);
                 } catch (IntentSender.SendIntentException e) {
+                    //TODO
                     Log.i(this.getLocalClassName(), "PendingIntent unable to execute request.");
                 }
                 break;
             case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                //TODO
                 Log.i(this.getLocalClassName(), "Location settings are inadequate, and cannot be fixed here. Dialog " +
                         "not created.");
                 break;
         }
     }
 
+    /**
+     * Request user to change the device settings as requested.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -492,29 +489,39 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         }
     }
 
+    /**
+     * Connect Google API Client when starting activity.
+     */
     @Override
     protected void onStart() {
         apiClient.connect();
         super.onStart();
     }
 
+    /**
+     * Disconnect Google API Client when stopping activity.
+     */
     @Override
     protected void onStop() {
         apiClient.disconnect();
         super.onStop();
     }
 
+    /**
+     * Start location updates again when resuming activity.
+     */
     @Override
     public void onResume() {
         super.onResume();
-        // Within {@code onPause()}, we pause location updates, but leave the
-        // connection to GoogleApiClient intact.  Here, we resume receiving
-        // location updates if the user has requested them.
+        // Resume receiving location updates
         if (apiClient.isConnected() && requestingLocationUpdates) {
             startLocationUpdates();
         }
     }
 
+    /**
+     * Stop location updates when pausing activity.
+     */
     @Override
     protected void onPause() {
         super.onPause();
@@ -528,15 +535,10 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
      * Requests location updates from the FusedLocationApi.
      */
     protected void startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+        Log.i(this.getLocalClassName(), "Check the permission to use location.");
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.i(this.getLocalClassName(), "Request a permission to use location.");
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSION_ACCESS_COARSE_LOCATION);
         }
 
         LocationServices.FusedLocationApi.requestLocationUpdates(
@@ -556,9 +558,6 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
      * Removes location updates from the FusedLocationApi.
      */
     protected void stopLocationUpdates() {
-        // It is a good practice to remove location requests when the activity is in a paused or
-        // stopped state. Doing so helps battery performance and is especially
-        // recommended in applications that request frequent location updates.
         LocationServices.FusedLocationApi.removeLocationUpdates(
                 apiClient,
                 this
@@ -588,24 +587,8 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             }
             // Get last location
             lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
-            updateLocation();
+            updateList();
         }
-
-//        // Check for the permission to access coarse location
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSION_ACCESS_COARSE_LOCATION);
-//        }
-//
-//        // Check for the permission to access fine location
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_ACCESS_FINE_LOCATION);
-//        }
-//
-//        // Get last known location
-//        lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
-//        LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-//        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_MIN_UPDATE_TIME_MILLIS, GPS_MIN_DIST_METERS, this);
-////        locationChanged.run();
     }
 
 
@@ -615,8 +598,6 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
      */
     @Override
     public void onConnectionSuspended(int i) {
-        // The connection to Google Play services was lost for some reason. We call connect() to
-        // attempt to re-establish the connection.
         Log.i(this.getLocalClassName(), "Connection suspended");
         apiClient.connect();
     }
@@ -629,10 +610,6 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
      */
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        // An unresolvable error has occurred and a connection to Google APIs
-        // could not be established. Display an error message, or handle
-        // the failure silently
-
        Log.i(this.getLocalClassName(), "Connection failed: ConnectionResult.getErrorCode() = " + connectionResult.getErrorCode());
 
         if (resolvingError) {
@@ -690,22 +667,21 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
 
 
     /*
-     * On location changed
+     * On location changed, set new location and update
      */
-
     @Override
     public void onLocationChanged(Location location) {
         Log.d(getClass().toString(), "location changed");
         if (location != null) {
             lastLocation = location;
         }
-        updateLocation();
+        updateList();
     }
 
     /**
      * Update species list when location is updated
      */
-    public void updateLocation() {
+    public void updateList() {
         if (lastLocation != null) {
             // convert coordinate
             int[] ykj = CoordinateConverter.WGSToYKJ(lastLocation.getLatitude(), lastLocation.getLongitude());
@@ -735,14 +711,17 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         DatabaseHelper myDbHelper = DatabaseHelper.getInstance(this);
         myDbHelper.initializeDataBase();
         try {
+            //fetch list from database according to YKJ coordinates
             int[] ykjCoord = CoordinateConverter.WGSToYKJ(n, e);
             speciesInSquare = myDbHelper.getSpeciesInSquare(ykjCoord[0] / 10000, ykjCoord[1] / 10000);
         } catch (Exception ex) {
+            //TODO
             ex.printStackTrace();
         } finally {
             try {
                 myDbHelper.close();
             } catch (Exception ex) {
+                //TODO
                 ex.printStackTrace();
             }
         }
