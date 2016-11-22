@@ -21,12 +21,14 @@ public class Species implements Serializable {
     private final int type;         //required
     private String idEng;
     private String idFin;
+    private String imgUrl;
 
     private Species(SpeciesBuilder builder) {
         this.name = builder.name;
         this.type = builder.type;
         this.idEng = builder.idEng;
         this.idFin = builder.idFin;
+        this.imgUrl = builder.imgUrl;
     }
 
     public String getName() {
@@ -44,11 +46,14 @@ public class Species implements Serializable {
     public String getIdEng() { return idEng; }
     public String getIdFin() { return idFin; }
 
+    public String getImgUrl() { return imgUrl; }
+
     public static class SpeciesBuilder {
         private final String name;      //required
         private final int type;         //required
         private String idEng = "";
         private String idFin = "";
+        private String imgUrl = "";
 
         public SpeciesBuilder(String name, int type) {
             this.name = name;
@@ -62,6 +67,11 @@ public class Species implements Serializable {
 
         public SpeciesBuilder setWikiIdFin(String id) {
             idFin = id;
+            return this;
+        }
+
+        public SpeciesBuilder setImageUrl(String url) {
+            imgUrl = url;
             return this;
         }
 

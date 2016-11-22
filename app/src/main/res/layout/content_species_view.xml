@@ -26,10 +26,12 @@
             android:layout_below="@id/species_content_text"
             android:visibility="invisible"
             android:layout_margin="@dimen/text_margin"
+            android:layout_marginTop="0dp"
             android:text="@string/read_more_wiki"
             android:id="@+id/species_content_button_wiki"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:onClick="openWikiPage"/>
 
         <ProgressBar
             style="?android:attr/progressBarStyle"

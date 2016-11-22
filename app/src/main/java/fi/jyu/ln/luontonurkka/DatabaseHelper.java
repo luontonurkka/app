@@ -314,7 +314,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @return A species object
      */
     private Species getSpeciesById(int speciesId) {
-        String[] tableColumns = new String[] {KEY_ID, KEY_NAME_LATIN, KEY_NAME_FIN, KEY_TYPE, KEY_WIKI_EN, KEY_WIKI_FI};
+        String[] tableColumns = new String[] {KEY_ID, KEY_NAME_LATIN, KEY_NAME_FIN, KEY_TYPE, KEY_WIKI_EN, KEY_WIKI_FI, KEY_PIC};
         String whereClause = KEY_ID + " = ?";
         String[] whereArgs = new String[] {Integer.toString(speciesId)};
 
@@ -331,6 +331,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     c.getInt(c.getColumnIndex(KEY_TYPE)))
                     .setWikiIdFin(Integer.toString(c.getInt(c.getColumnIndex(KEY_WIKI_FI))))
                     .setWikiIdEng(Integer.toString(c.getInt(c.getColumnIndex(KEY_WIKI_EN))))
+                    .setImageUrl(c.getString(c.getColumnIndex(KEY_PIC)))
                     .build();
         }
 
