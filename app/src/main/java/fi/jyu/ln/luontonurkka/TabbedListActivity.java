@@ -108,13 +108,12 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabbed);
 
-        //Requesting for location updates
-        requestingLocationUpdates = true;
         //Build the Google API Client, LocationRequest and LocationSettingsRequest
         buildGoogleApiClient();
         createLocationRequest();
         buildLocationSettingsRequest();
         checkLocationSettings();
+        requestingLocationUpdates = false;
 
         //get intent
         Intent intent = getIntent();
@@ -453,7 +452,8 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         switch (status.getStatusCode()) {
             case LocationSettingsStatusCodes.SUCCESS:
                 Log.i(this.getLocalClassName(), "All location settings are satisfied.");
-                startLocationUpdates();
+//                startLocationUpdates();
+                requestingLocationUpdates = true;
                 break;
             case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                 Log.i(this.getLocalClassName(), "Location settings are not satisfied. Show the user a dialog to" +
@@ -485,7 +485,8 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                 switch (resultCode) {
                     case Activity.RESULT_OK:
                         Log.i(this.getLocalClassName(), "User agreed to make required location settings changes.");
-                        startLocationUpdates();
+                        requestingLocationUpdates = true;
+//                        startLocationUpdates();
                         break;
                     case Activity.RESULT_CANCELED:
                         Log.i(this.getLocalClassName(), "User chose not to make required location settings changes.");
@@ -493,6 +494,26 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                         break;
                 }
                 break;
+        }
+    }
+
+    /**
+     * Act on users decision to allow or deny location.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSION_ACCESS_COARSE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //user allowed app to use location
+                    requestingLocationUpdates = true;
+                } else {
+                    //user denied app to use location
+                    openMapView();
+                }
+                return;
+            }
         }
     }
 
@@ -542,6 +563,8 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
      * Requests location updates from the FusedLocationApi.
      */
     protected void startLocationUpdates() {
+        Log.i(this.getLocalClassName(), "Start location updates.");
+
         Log.i(this.getLocalClassName(), "Check the permission to use location.");
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.i(this.getLocalClassName(), "Request a permission to use location.");
@@ -589,12 +612,19 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         // FusedLocationApi.getLastLocation() to get it.
         if (lastLocation == null) {
             // Ask user for permission to use coarse location
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[] { android.Manifest.permission.ACCESS_COARSE_LOCATION }, MY_PERMISSION_ACCESS_COARSE_LOCATION);
+            Log.i(this.getLocalClassName(), "Check the permission to use location.");
+            if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                Log.i(this.getLocalClassName(), "Request a permission to use location.");
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSION_ACCESS_COARSE_LOCATION);
             }
             // Get last location
             lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
             updateList();
+
+            // Start location updates
+            if (requestingLocationUpdates) {
+                startLocationUpdates();
+            }
         }
     }
 
