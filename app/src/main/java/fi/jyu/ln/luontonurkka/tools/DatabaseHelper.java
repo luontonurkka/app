@@ -1,4 +1,4 @@
-package fi.jyu.ln.luontonurkka;
+package fi.jyu.ln.luontonurkka.tools;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -10,6 +10,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+
+import fi.jyu.ln.luontonurkka.R;
+import fi.jyu.ln.luontonurkka.Species;
+import fi.jyu.ln.luontonurkka.SpeciesLists;
 
 /**
  * Created by sinikka on 7.11.2016.

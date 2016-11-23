@@ -1,4 +1,4 @@
-package fi.jyu.ln.luontonurkka;
+package fi.jyu.ln.luontonurkka.tools;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
