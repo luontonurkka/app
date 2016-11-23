@@ -112,7 +112,6 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         buildGoogleApiClient();
         createLocationRequest();
         buildLocationSettingsRequest();
-        checkLocationSettings();
         requestingLocationUpdates = false;
 
         //get intent
@@ -508,6 +507,8 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //user allowed app to use location
                     requestingLocationUpdates = true;
+                    //check location settings
+                    checkLocationSettings();
                 } else {
                     //user denied app to use location
                     openMapView();
