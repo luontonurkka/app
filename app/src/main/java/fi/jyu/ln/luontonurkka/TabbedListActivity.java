@@ -284,9 +284,16 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
     }
 
     /**
+     * Clicking on the map button opens the map view.
+     */
+    protected void onMapButtonClick(View view) {
+        openMapView();
+    }
+
+    /**
      * Opens the map view activity and finishes the current activity.
      */
-    protected void openMapView(View view) {
+    protected void openMapView() {
         finish();
         if (!(getIntent().getBooleanExtra(MapsActivity.FROM_MAP_VIEW, false))) {
             Intent intent = new Intent(this, MapsActivity.class);
@@ -482,7 +489,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                         break;
                     case Activity.RESULT_CANCELED:
                         Log.i(this.getLocalClassName(), "User chose not to make required location settings changes.");
-                        //TODO Käyttäjä ei antanut lupaa sijaintiin, näytä kartta?
+                        openMapView();
                         break;
                 }
                 break;
@@ -591,8 +598,6 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         }
     }
 
-
-
     /**
      * Connection to Google API Client was lost, try to connect again.
      */
@@ -601,8 +606,6 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         Log.i(this.getLocalClassName(), "Connection suspended");
         apiClient.connect();
     }
-
-
 
     /**
      * If connection to Google API Client fails (can't get location), try to resolve the error

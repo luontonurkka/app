@@ -88,7 +88,7 @@
             android:layout_margin="16dp"
             app:layout_anchor="@id/list_pager"
             app:layout_anchorGravity="bottom|right|end"
-            android:onClick="openMapView"
+            android:onClick="onMapButtonClick"
             />
 
     </android.support.design.widget.CoordinatorLayout>
