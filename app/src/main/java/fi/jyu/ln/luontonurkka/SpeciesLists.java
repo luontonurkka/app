@@ -1,6 +1,9 @@
 package fi.jyu.ln.luontonurkka;
 
 import java.util.ArrayList;
+import java.util.Collections;
+
+import fi.jyu.ln.luontonurkka.tools.SpeciesComparatorByFreq;
 
 /**
  * Contains array lists for different species types.
@@ -29,6 +32,8 @@ public class SpeciesLists {
         ArrayList<Species> all = new ArrayList<Species>();
         all.addAll(birds);
         all.addAll(plants);
+        SpeciesComparatorByFreq speciesComparatorByFreq = new SpeciesComparatorByFreq();
+        Collections.sort(all, speciesComparatorByFreq);
         return all;
     }
 }

@@ -1,6 +1,7 @@
 package fi.jyu.ln.luontonurkka;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 /**
  * A class representing a species, using builder design pattern.
@@ -22,6 +23,7 @@ public class Species implements Serializable {
     private String idEng;
     private String idFin;
     private String imgUrl;
+    private int freq;
 
     private Species(SpeciesBuilder builder) {
         this.name = builder.name;
@@ -29,6 +31,7 @@ public class Species implements Serializable {
         this.idEng = builder.idEng;
         this.idFin = builder.idFin;
         this.imgUrl = builder.imgUrl;
+        this.freq = builder.freq;
     }
 
     public String getName() {
@@ -48,12 +51,15 @@ public class Species implements Serializable {
 
     public String getImgUrl() { return imgUrl; }
 
+    public int getFreq() { return freq; }
+
     public static class SpeciesBuilder {
         private final String name;      //required
         private final int type;         //required
         private String idEng = "";
         private String idFin = "";
         private String imgUrl = "";
+        private int freq = 0;
 
         public SpeciesBuilder(String name, int type) {
             this.name = name;
@@ -75,9 +81,13 @@ public class Species implements Serializable {
             return this;
         }
 
+        public SpeciesBuilder setFreq(int frequency) {
+            freq = frequency;
+            return this;
+        }
+
         public Species build() {
             return new Species(this);
         }
     }
-
 }

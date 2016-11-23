@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import fi.jyu.ln.luontonurkka.R;
 import fi.jyu.ln.luontonurkka.Species;
@@ -289,7 +290,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @return SpeciesLists object containing separate lists
      */
     public SpeciesLists getSpeciesInSquare(int n, int e) {
-        String[] tableColumns = new String[] {KEY_ID, KEY_SPEC_ID, KEY_SQ_ID};
+        String[] tableColumns = new String[] {KEY_ID, KEY_SPEC_ID, KEY_SQ_ID, KEY_FREQ};
         String whereClause = KEY_SQ_ID + " = ?";
         String[] whereArgs = new String[] {Integer.toString(getSquare(n, e))};
 
@@ -299,7 +300,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Species s;
 
             while (c.moveToNext()) {
-                s = getSpeciesById(c.getInt(c.getColumnIndex(KEY_SPEC_ID)));
+                s = getSpeciesById(c.getInt(c.getColumnIndex(KEY_SPEC_ID)), c.getInt(c.getColumnIndex(KEY_FREQ)));
                 if (s.getType() == Species.BIRD) {
                     birdsInSquare.add(s);
                 }
@@ -309,6 +310,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
 
+        //sort species lists by frequency
+        SpeciesComparatorByFreq speciesComparatorByFreq = new SpeciesComparatorByFreq();
+        Collections.sort(birdsInSquare, speciesComparatorByFreq);
+        Collections.sort(plantsInSquare, speciesComparatorByFreq);
+
         return new SpeciesLists(birdsInSquare, plantsInSquare);
     }
 
@@ -317,7 +323,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param speciesId Id of the species
      * @return A species object
      */
-    private Species getSpeciesById(int speciesId) {
+    private Species getSpeciesById(int speciesId, int freq) {
         String[] tableColumns = new String[] {KEY_ID, KEY_NAME_LATIN, KEY_NAME_FIN, KEY_TYPE, KEY_WIKI_EN, KEY_WIKI_FI, KEY_PIC};
         String whereClause = KEY_ID + " = ?";
         String[] whereArgs = new String[] {Integer.toString(speciesId)};
@@ -336,6 +342,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     .setWikiIdFin(Integer.toString(c.getInt(c.getColumnIndex(KEY_WIKI_FI))))
                     .setWikiIdEng(Integer.toString(c.getInt(c.getColumnIndex(KEY_WIKI_EN))))
                     .setImageUrl(c.getString(c.getColumnIndex(KEY_PIC)))
+                    .setFreq(freq)
                     .build();
         }
 
