@@ -38,11 +38,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<LocationSettingsResult> {
     private GoogleMap map;
     private Marker locationMarker;
-    private LatLng loc;
     private GoogleApiClient apiClient;
 
     private static LatLng clickedPoint;
-    private Location deviceLocation;
+    private static boolean myLocationEnabled;
 
     /**
      * Intent extras
@@ -79,6 +78,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        //disable my location on default
+        myLocationEnabled = false;
+
         //build and connect Google API client
         buildGoogleApiClient();
 
@@ -93,9 +95,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.addLocationRequest(locationRequest);
         locationSettingsRequest = builder.build();
-
-        //check location settings
-        checkLocationSettings();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -130,10 +129,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     @Override
     public void onResume() {
-        super.onResume();
 //        if (!(apiClient.isConnected())) {
 //            apiClient.connect();
 //        }
+        super.onResume();
     }
 
     /**
@@ -168,6 +167,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(65.551806, 26.305592), 5));
         map.setOnMapClickListener(this);
         map.setOnInfoWindowClickListener(this);
+
+        Log.i(this.getLocalClassName(), "Check the permission to use location.");
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.i(this.getLocalClassName(), "Request a permission to use location.");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_ACCESS_FINE_LOCATION);
+        }
+
+        if (myLocationEnabled) {
+            map.setMyLocationEnabled(true);
+        }
     }
 
     @Override
@@ -321,7 +330,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         switch (status.getStatusCode()) {
             case LocationSettingsStatusCodes.SUCCESS:
                 Log.i(this.getLocalClassName(), "All location settings are satisfied.");
-                enableMyLocation();
+//                enableMyLocation();
+                myLocationEnabled = true;
                 break;
             case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                 Log.i(this.getLocalClassName(), "Location settings are not satisfied. Show the user a dialog to" +
@@ -351,13 +361,37 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 switch (resultCode) {
                     case Activity.RESULT_OK:
                         Log.i(this.getLocalClassName(), "User agreed to make required location settings changes.");
-                        enableMyLocation();
+//                        enableMyLocation();
+                        myLocationEnabled = true;
                         break;
                     case Activity.RESULT_CANCELED:
                         Log.i(this.getLocalClassName(), "User chose not to make required location settings changes.");
+                        myLocationEnabled = false;
                         break;
                 }
                 break;
+        }
+    }
+
+
+    /**
+     * Act on users decision to allow or deny location.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSION_ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //user allowed app to use location
+                    myLocationEnabled = true;
+                    checkLocationSettings();
+                } else {
+                    //user denied app to use location
+                    myLocationEnabled = false;
+                }
+                return;
+            }
         }
     }
 
@@ -365,21 +399,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Show device location on map.
      */
     public void enableMyLocation() {
-        // Get last known location
         Log.i(this.getLocalClassName(), "Check the permission to use location.");
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.i(this.getLocalClassName(), "Request a permission to use location.");
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_ACCESS_FINE_LOCATION);
         }
 
-        map.setMyLocationEnabled(true);
-
-//        deviceLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
-
-//        if (deviceLocation != null && map != null) {
-//            loc = new LatLng(deviceLocation.getLatitude(), deviceLocation.getLongitude());
-//            Log.i(this.getLocalClassName(), "Showing location on map: " + loc.latitude + ", " + loc.longitude);
-//            map.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, 10));
-//        }
+        if (myLocationEnabled) {
+            map.setMyLocationEnabled(true);
+        }
     }
 }
