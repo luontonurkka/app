@@ -12,12 +12,10 @@
     <string name="tab_plants">Kasvit</string>
 
     <string name="setting_night_theme">night-theme</string>
-    <string name="setting_disable_gps">use-gps</string>
     <string name="setting_map_default">map-default</string>
 
-    <string name="disable_gps">Poista GPS käytöstä</string>
     <string name="map_default">Karttanäkymä aloitussivuna</string>
-    <string name="night_theme">Yö teema</string>
+    <string name="night_theme">Yöteema</string>
 
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_loader">Loader</string>

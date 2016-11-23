@@ -42,19 +42,6 @@ public class CustomNavigationView extends NavigationView {
                 }
             });
 
-            final String gpsSettingsString = context.getString(R.string.setting_disable_gps);
-            Switch gpsSwitch = (Switch) headerView.findViewById(R.id.switch_gps);
-            boolean gps = sm.getBool(gpsSettingsString);
-            if (gps) {
-                gpsSwitch.toggle();
-            }
-            gpsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    sm.setBool(gpsSettingsString, isChecked);
-                }
-            });
-
             final String mapSettingsString = context.getString(R.string.setting_map_default);
             Switch mapSwitch = (Switch) headerView.findViewById(R.id.switch_map);
             boolean mapDefault = sm.getBool(mapSettingsString);

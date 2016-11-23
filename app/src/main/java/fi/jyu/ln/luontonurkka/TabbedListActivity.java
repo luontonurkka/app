@@ -1,6 +1,5 @@
 package fi.jyu.ln.luontonurkka;
 
-import android.*;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -50,6 +49,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import java.util.ArrayList;
 
 import fi.jyu.ln.luontonurkka.tools.CoordinateConverter;
+import fi.jyu.ln.luontonurkka.tools.DatabaseHelper;
 
 public class TabbedListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<LocationSettingsResult>, com.google.android.gms.location.LocationListener {
 
