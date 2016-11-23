@@ -112,16 +112,19 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         buildGoogleApiClient();
         createLocationRequest();
         buildLocationSettingsRequest();
-        requestingLocationUpdates = false;
 
         //get intent
         Intent intent = getIntent();
 
         //if list view was opened from map activity
         if (intent.getBooleanExtra(MapsActivity.FROM_MAP_VIEW, false)) {
+            //if came to list view from map view, don't update location
+            requestingLocationUpdates = false;
             lastLocationYKJ = CoordinateConverter.WGSToYKJ(intent.getDoubleExtra(MapsActivity.ARG_NORTH_COORD, 62.2141), intent.getDoubleExtra(MapsActivity.ARG_EAST_COORD, 25.7126));
             //TODO Decide on default coordinates
             speciesInSquare = getSpeciesList(intent.getDoubleExtra(MapsActivity.ARG_NORTH_COORD, 62.2141), intent.getDoubleExtra(MapsActivity.ARG_EAST_COORD, 25.7126));
+        } else {
+            requestingLocationUpdates = true;
         }
 
         // If species in square is null, create an example list
