@@ -458,7 +458,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                 requestingLocationUpdates = true;
                 break;
             case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                Log.i(this.getLocalClassName(), "Location settings are not satisfied. Show the user a dialog to" +
+                Log.i(this.getLocalClassName(), "Location settings are not satisfied. Show the user a dialog to " +
                         "upgrade location settings ");
                 try {
                     // Show the dialog by calling startResolutionForResult(), and check the result in onActivityResult().
@@ -492,6 +492,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                         break;
                     case Activity.RESULT_CANCELED:
                         Log.i(this.getLocalClassName(), "User chose not to make required location settings changes.");
+                        requestingLocationUpdates = false;
                         openMapView();
                         break;
                 }
@@ -573,19 +574,22 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.i(this.getLocalClassName(), "Request a permission to use location.");
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSION_ACCESS_COARSE_LOCATION);
+        } else {
+            Log.i(this.getLocalClassName(), "Permission to use location already granted.");
+            //check location settings
+//            checkLocationSettings();
+
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    apiClient,
+                    locationRequest,
+                    this
+            ).setResultCallback(new ResultCallback<Status>() {
+                @Override
+                public void onResult(Status status) {
+                    requestingLocationUpdates = true;
+                }
+            });
         }
-
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                apiClient,
-                locationRequest,
-                this
-        ).setResultCallback(new ResultCallback<Status>() {
-            @Override
-            public void onResult(Status status) {
-                requestingLocationUpdates = true;
-            }
-        });
-
     }
 
     /**
@@ -620,11 +624,22 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 Log.i(this.getLocalClassName(), "Request a permission to use location.");
                 ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSION_ACCESS_COARSE_LOCATION);
-            }
-            // Get last location
-            lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
-            updateList();
+            } else {
+                Log.i(this.getLocalClassName(), "Permission to use location already granted.");
+                //check location settings
+                checkLocationSettings();
 
+                // Get last location
+                lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
+                updateList();
+
+                // Start location updates
+                if (requestingLocationUpdates) {
+                    startLocationUpdates();
+                }
+            }
+        }
+        else {
             // Start location updates
             if (requestingLocationUpdates) {
                 startLocationUpdates();
