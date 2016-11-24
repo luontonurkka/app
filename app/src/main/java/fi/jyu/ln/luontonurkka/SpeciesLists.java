@@ -2,6 +2,7 @@ package fi.jyu.ln.luontonurkka;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import fi.jyu.ln.luontonurkka.tools.SpeciesComparatorByFreq;
 
@@ -12,24 +13,24 @@ import fi.jyu.ln.luontonurkka.tools.SpeciesComparatorByFreq;
 
 public class SpeciesLists {
 
-    private ArrayList<Species> birds;
-    private ArrayList<Species> plants;
+    private List<Species> birds;
+    private List<Species> plants;
 
-    public SpeciesLists(ArrayList<Species> birds, ArrayList<Species> plants) {
+    public SpeciesLists(List<Species> birds, List<Species> plants) {
         this.birds = birds;
         this.plants = plants;
     }
 
-    public ArrayList<Species> getPlants() {
+    public List<Species> getPlants() {
         return plants;
     }
 
-    public ArrayList<Species> getBirds() {
+    public List<Species> getBirds() {
         return birds;
     }
 
-    public ArrayList<Species> getAll() {
-        ArrayList<Species> all = new ArrayList<Species>();
+    public List<Species> getAll() {
+        List<Species> all = new ArrayList<Species>();
         all.addAll(birds);
         all.addAll(plants);
         SpeciesComparatorByFreq speciesComparatorByFreq = new SpeciesComparatorByFreq();

@@ -47,6 +47,7 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import fi.jyu.ln.luontonurkka.tools.CoordinateConverter;
 import fi.jyu.ln.luontonurkka.tools.DatabaseHelper;
@@ -54,6 +55,7 @@ import fi.jyu.ln.luontonurkka.tools.DatabaseHelper;
 public class TabbedListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<LocationSettingsResult>, com.google.android.gms.location.LocationListener {
 
     private static SpeciesLists speciesInSquare;
+    private static final int LIST_LENGTH = 30;
     private int[] lastLocationYKJ = {0, 0};
 //    private LastKnownLocation lkl;
 
@@ -172,10 +174,10 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static ListFragment newInstance(int sectionNumber, ArrayList<Species> speciesList) {
+        public static ListFragment newInstance(int sectionNumber, List<Species> speciesList) {
             ListFragment fragment = new ListFragment();
             Bundle args = new Bundle();
-            args.putSerializable(ARG_SPECIES_LIST, speciesList);
+            args.putSerializable(ARG_SPECIES_LIST, new ArrayList<Species>(speciesList));
             fragment.setArguments(args);
             return fragment;
         }
@@ -243,11 +245,11 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             // Return a ListFragment (defined as a static inner class below).
 
             if (position == 1) {
-                return ListFragment.newInstance(position, speciesInSquare.getBirds());
+                return ListFragment.newInstance(position, new ArrayList<Species>(speciesInSquare.getBirds().subList(0, LIST_LENGTH)));
             } else if (position == 2) {
-                return ListFragment.newInstance(position, speciesInSquare.getPlants());
+                return ListFragment.newInstance(position, new ArrayList<Species>(speciesInSquare.getPlants().subList(0, LIST_LENGTH)));
             } else {
-                return ListFragment.newInstance(position, speciesInSquare.getAll());
+                return ListFragment.newInstance(position, new ArrayList<Species>(speciesInSquare.getAll().subList(0, LIST_LENGTH)));
             }
         }
 

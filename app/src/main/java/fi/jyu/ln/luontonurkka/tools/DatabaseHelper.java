@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import fi.jyu.ln.luontonurkka.R;
 import fi.jyu.ln.luontonurkka.Species;
@@ -294,8 +295,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String whereClause = KEY_SQ_ID + " = ?";
         String[] whereArgs = new String[] {Integer.toString(getSquare(n, e))};
 
-        ArrayList<Species> birdsInSquare = new ArrayList<Species>();
-        ArrayList<Species> plantsInSquare = new ArrayList<Species>();
+        List<Species> birdsInSquare = new ArrayList<Species>();
+        List<Species> plantsInSquare = new ArrayList<Species>();
         try (SQLiteDatabase db = getWritableDatabase(); Cursor c = db.query(TABLE_SPEC_IN_SQ, tableColumns, whereClause, whereArgs, null, null, null);) {
             Species s;
 
