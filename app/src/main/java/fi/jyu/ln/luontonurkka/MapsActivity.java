@@ -172,9 +172,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.i(this.getLocalClassName(), "Request a permission to use location.");
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_ACCESS_FINE_LOCATION);
+        } else {
+            Log.i(this.getLocalClassName(), "Permission to use location already granted.");
+            //check location settings
+            checkLocationSettings();
         }
 
         if (myLocationEnabled) {
+            Log.i(this.getLocalClassName(), "My Location enabled.");
             map.setMyLocationEnabled(true);
         }
     }
@@ -331,10 +336,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             case LocationSettingsStatusCodes.SUCCESS:
                 Log.i(this.getLocalClassName(), "All location settings are satisfied.");
 //                enableMyLocation();
-                myLocationEnabled = true;
+//                myLocationEnabled = true;
+
+                Log.i(this.getLocalClassName(), "Check the permission to use location.");
+                if (ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    Log.i(this.getLocalClassName(), "Request a permission to use location.");
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_ACCESS_FINE_LOCATION);
+                } else {
+                    Log.i(this.getLocalClassName(), "Permission to use location already granted.");
+                    myLocationEnabled = true;
+                }
+
+                if (myLocationEnabled) {
+                    Log.i(this.getLocalClassName(), "My Location enabled.");
+                    map.setMyLocationEnabled(true);
+                }
+
                 break;
             case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                Log.i(this.getLocalClassName(), "Location settings are not satisfied. Show the user a dialog to" +
+                Log.i(this.getLocalClassName(), "Location settings are not satisfied. Show the user a dialog to " +
                         "upgrade location settings ");
                 try {
                     // Show the dialog by calling startResolutionForResult(), and check the result in onActivityResult().
@@ -362,7 +382,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     case Activity.RESULT_OK:
                         Log.i(this.getLocalClassName(), "User agreed to make required location settings changes.");
 //                        enableMyLocation();
-                        myLocationEnabled = true;
+//                        myLocationEnabled = true;
+
+                        Log.i(this.getLocalClassName(), "Check the permission to use location.");
+                        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            Log.i(this.getLocalClassName(), "Request a permission to use location.");
+                            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_ACCESS_FINE_LOCATION);
+                        } else {
+                            Log.i(this.getLocalClassName(), "Permission to use location already granted.");
+                            myLocationEnabled = true;
+                        }
+
+                        if (myLocationEnabled) {
+                            Log.i(this.getLocalClassName(), "My Location enabled.");
+                            map.setMyLocationEnabled(true);
+                        }
+
                         break;
                     case Activity.RESULT_CANCELED:
                         Log.i(this.getLocalClassName(), "User chose not to make required location settings changes.");
@@ -385,6 +420,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //user allowed app to use location
                     myLocationEnabled = true;
+                    //check location settings
                     checkLocationSettings();
                 } else {
                     //user denied app to use location
