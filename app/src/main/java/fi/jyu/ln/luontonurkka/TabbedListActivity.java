@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -46,6 +47,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.nearby.messages.internal.Update;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,11 +57,12 @@ import fi.jyu.ln.luontonurkka.tools.DatabaseHelper;
 
 public class TabbedListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<LocationSettingsResult>, com.google.android.gms.location.LocationListener {
 
+    // TODO remove
+    private long startTime;
+
     private static SpeciesLists speciesInSquare;
     private static final int LIST_LENGTH = 30;
     private int[] lastLocationYKJ = {0, 0};
-//    private LastKnownLocation lkl;
-
     private GoogleApiClient apiClient;
 
     private Location lastLocation;
@@ -108,13 +111,18 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        startTime = System.currentTimeMillis();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabbed);
+
+        time("api build");
 
         //Build the Google API Client, LocationRequest and LocationSettingsRequest
         buildGoogleApiClient();
         createLocationRequest();
         buildLocationSettingsRequest();
+
+        time("intent");
 
         //get intent
         Intent intent = getIntent();
@@ -130,20 +138,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             requestingLocationUpdates = true;
         }
 
-        // If species in square is null, create an example list
-        if (speciesInSquare == null) {
-            ArrayList<Species> testiLista = new ArrayList<Species>(10);
-            for (int i = 0; i < 10; i++) {
-                if (i > 5) {
-                    Species s = new Species.SpeciesBuilder("Koira", 1).setWikiIdFin("612").build();
-                    testiLista.add(i, s);
-                } else {
-                    Species s = new Species.SpeciesBuilder("Kissa", 1).setWikiIdFin("7064").build();
-                    testiLista.add(i, s);
-                }
-            }
-//            speciesInSquare = testiLista;
-        }
+        time("adapter");
 
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
@@ -156,6 +151,8 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.list_pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        time("on create done");
     }
 
     /**
@@ -187,12 +184,10 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.activity_list, container, false);
-            //TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+
             ArrayList<Species> speciesList = (ArrayList<Species>) getArguments().getSerializable(ARG_SPECIES_LIST);
 
             SpeciesListAdapter sla = new SpeciesListAdapter(container.getContext(), speciesList);
-            //SpeciesListAdapter sla = new SpeciesListAdapter(container.getContext(), speciesInSquare);
 
             ListView listView = (ListView) rootView.findViewById(R.id.species_list);
             listView.setAdapter(sla);
@@ -578,6 +573,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
      */
     protected void startLocationUpdates() {
         Log.i(this.getLocalClassName(), "Start location updates.");
+        time("start location updates");
 
         Log.i(this.getLocalClassName(), "Check the permission to use location.");
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -599,6 +595,9 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                 }
             });
         }
+
+        Log.i(this.getLocalClassName(), "Location check done.");
+        time("location check done");
     }
 
     /**
@@ -624,36 +623,50 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
     @Override
     public void onConnected(Bundle connectionHint) {
         Log.i(this.getLocalClassName(), "Connected to GoogleApiClient");
+        time("connected to api");
 
         // If the initial location was never previously requested, we use
         // FusedLocationApi.getLastLocation() to get it.
-        if (lastLocation == null) {
-            // Ask user for permission to use coarse location
-            Log.i(this.getLocalClassName(), "Check the permission to use location.");
-            if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                Log.i(this.getLocalClassName(), "Request a permission to use location.");
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSION_ACCESS_COARSE_LOCATION);
-            } else {
-                Log.i(this.getLocalClassName(), "Permission to use location already granted.");
-                //check location settings
-                checkLocationSettings();
 
-                // Get last location
-                lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
-                updateList();
+        final TabbedListActivity activity = this;
 
-                // Start location updates
-                if (requestingLocationUpdates) {
-                    startLocationUpdates();
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                if (lastLocation == null) {
+                    // Ask user for permission to use coarse location
+                    Log.i(activity.getLocalClassName(), "Check the permission to use location.");
+                    if (ContextCompat.checkSelfPermission(activity.getApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        Log.i(activity.getLocalClassName(), "Request a permission to use location.");
+                        ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSION_ACCESS_COARSE_LOCATION);
+                    } else {
+                        Log.i(activity.getLocalClassName(), "Permission to use location already granted.");
+                        //check location settings
+                        checkLocationSettings();
+
+                        // Get last location
+
+                        lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
+                        UpdateListTask task = new UpdateListTask();
+                        task.execute(new Void[0]);
+
+                        // Start location updates
+                        if (requestingLocationUpdates) {
+                            startLocationUpdates();
+                        }
+                    }
+                }
+                else {
+                    // Start location updates
+                    if (requestingLocationUpdates) {
+                        startLocationUpdates();
+                    }
                 }
             }
-        }
-        else {
-            // Start location updates
-            if (requestingLocationUpdates) {
-                startLocationUpdates();
-            }
-        }
+        };
+        thread.run();
+
+        time("on connected done");
     }
 
     /**
@@ -736,27 +749,46 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         if (location != null) {
             lastLocation = location;
         }
-        updateList();
+        UpdateListTask task = new UpdateListTask();
+        task.execute(new Void[0]);
     }
 
-    /**
-     * Update species list when location is updated
-     */
-    public void updateList() {
-        if (lastLocation != null) {
-            // convert coordinate
-            int[] ykj = CoordinateConverter.WGSToYKJ(lastLocation.getLatitude(), lastLocation.getLongitude());
-            // TODO remove debug text
-            ((TextView) findViewById(R.id.testi_text)).setText(ykj[0] + "," + ykj[1] + " " + lastLocation.getLatitude() + "," + lastLocation.getLongitude());
-            // only update list if in different grid square
-            if (lastLocationYKJ[0] != ykj[0] && lastLocationYKJ[1] != ykj[1]) {
-                speciesInSquare = getSpeciesList(lastLocation.getLatitude(), lastLocation.getLongitude());
-                mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-                mViewPager = (ViewPager) findViewById(R.id.list_pager);
-                mViewPager.setAdapter(mSectionsPagerAdapter);
-                lastLocationYKJ = ykj;
+    private class UpdateListTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            time("updating list");
+            if (lastLocation != null) {
+                // convert coordinate
+                int[] ykj = CoordinateConverter.WGSToYKJ(lastLocation.getLatitude(), lastLocation.getLongitude());
+                Log.d(getClass().toString(), (lastLocationYKJ[0] - ykj[0]) + " " + (lastLocationYKJ[1] - ykj[1]));
+                // only update list if in different grid square
+                if (lastLocationYKJ[0] != ykj[0] && lastLocationYKJ[1] != ykj[1]) {
+                    time("getting species list");
+                    speciesInSquare = getSpeciesList(lastLocation.getLatitude(), lastLocation.getLongitude());
+                    time("done species list");
+                    mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+                    mViewPager = (ViewPager) findViewById(R.id.list_pager);
+                    // adapter has to be set in ui thread
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mViewPager.setAdapter(mSectionsPagerAdapter);
+                            findViewById(R.id.list_loading).setVisibility(View.INVISIBLE);
+                        }
+                    });
+                    lastLocationYKJ = ykj;
+                }
             }
+            time("list updated");
+
+            return null;
         }
+    }
+
+    private void time(String text) {
+        String time = System.currentTimeMillis() - startTime + "";
+        Log.d(getClass().toString(), time + " " + text);
     }
 
 
