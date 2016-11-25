@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -224,6 +225,12 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                         ((TabbedListActivity) row.getContext()).openSpeciesView(species);
                     }
                 });
+                ImageView icon = (ImageView) row.findViewById(R.id.list_image);
+                if(species.getType() == Species.BIRD) {
+                    icon.setImageResource(R.drawable.ic_bird);
+                } else if (species.getType() == Species.PLANT) {
+                    icon.setImageResource(R.drawable.ic_leaf);
+                }
                 return row;
             }
         }
