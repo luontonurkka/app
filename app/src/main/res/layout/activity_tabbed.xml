@@ -45,18 +45,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
                     <Button
+                        android:id="@+id/tab_all"
+                        android:background="@drawable/rect"
                         android:text="@string/tab_all"
                         android:onClick="showAllTab"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="?android:attr/borderlessButtonStyle"/>
                     <Button
+                        android:id="@+id/tab_birds"
                         android:text="@string/tab_birds"
                         android:onClick="showBirdsTab"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="?android:attr/borderlessButtonStyle"/>
                     <Button
+                        android:id="@+id/tab_plants"
                         android:text="@string/tab_plants"
                         android:onClick="showPlantsTab"
                         android:layout_width="wrap_content"

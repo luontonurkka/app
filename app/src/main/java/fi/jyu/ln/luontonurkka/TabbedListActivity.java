@@ -115,14 +115,10 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabbed);
 
-        time("api build");
-
         //Build the Google API Client, LocationRequest and LocationSettingsRequest
         buildGoogleApiClient();
         createLocationRequest();
         buildLocationSettingsRequest();
-
-        time("intent");
 
         //get intent
         Intent intent = getIntent();
@@ -138,8 +134,6 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             requestingLocationUpdates = true;
         }
 
-        time("adapter");
-
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
@@ -152,7 +146,28 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         mViewPager = (ViewPager) findViewById(R.id.list_pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        time("on create done");
+        // Listener to check page change by swiping
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
+
+            @Override
+            public void onPageSelected(int position) {
+                Button[] bts = {(Button) findViewById(R.id.tab_all),
+                        (Button) findViewById(R.id.tab_birds),
+                        (Button) findViewById(R.id.tab_plants)
+                };
+                for (int i = 0; i < bts.length; i++) {
+                    if(i == position)
+                        bts[i].setBackground(getResources().getDrawable(R.drawable.rect));
+                    else
+                        bts[i].setBackground(null);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) { }
+        });
     }
 
     /**
@@ -331,6 +346,18 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
     }
 
     public void showTab(int index) {
+        // change button bg to show white line
+        // to indicate selected tab
+        Button[] bts = {(Button) findViewById(R.id.tab_all),
+            (Button) findViewById(R.id.tab_birds),
+            (Button) findViewById(R.id.tab_plants)
+        };
+        for (int i = 0; i < bts.length; i++) {
+            if(i == index)
+                bts[i].setBackground(getResources().getDrawable(R.drawable.rect));
+            else
+                bts[i].setBackground(null);
+        }
         ViewPager pager = (ViewPager) findViewById(R.id.list_pager);
         pager.setCurrentItem(index);
     }
@@ -573,7 +600,6 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
      */
     protected void startLocationUpdates() {
         Log.i(this.getLocalClassName(), "Start location updates.");
-        time("start location updates");
 
         Log.i(this.getLocalClassName(), "Check the permission to use location.");
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -597,7 +623,6 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         }
 
         Log.i(this.getLocalClassName(), "Location check done.");
-        time("location check done");
     }
 
     /**
@@ -623,7 +648,6 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
     @Override
     public void onConnected(Bundle connectionHint) {
         Log.i(this.getLocalClassName(), "Connected to GoogleApiClient");
-        time("connected to api");
 
         // If the initial location was never previously requested, we use
         // FusedLocationApi.getLastLocation() to get it.
@@ -665,8 +689,6 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             }
         };
         thread.run();
-
-        time("on connected done");
     }
 
     /**
@@ -757,16 +779,16 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
 
         @Override
         protected Void doInBackground(Void... params) {
-            time("updating list");
+
             if (lastLocation != null) {
                 // convert coordinate
                 int[] ykj = CoordinateConverter.WGSToYKJ(lastLocation.getLatitude(), lastLocation.getLongitude());
                 Log.d(getClass().toString(), (lastLocationYKJ[0] - ykj[0]) + " " + (lastLocationYKJ[1] - ykj[1]));
                 // only update list if in different grid square
                 if (lastLocationYKJ[0] != ykj[0] && lastLocationYKJ[1] != ykj[1]) {
-                    time("getting species list");
+
                     speciesInSquare = getSpeciesList(lastLocation.getLatitude(), lastLocation.getLongitude());
-                    time("done species list");
+
                     mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
                     mViewPager = (ViewPager) findViewById(R.id.list_pager);
                     // adapter has to be set in ui thread
@@ -780,17 +802,10 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                     lastLocationYKJ = ykj;
                 }
             }
-            time("list updated");
 
             return null;
         }
     }
-
-    private void time(String text) {
-        String time = System.currentTimeMillis() - startTime + "";
-        Log.d(getClass().toString(), time + " " + text);
-    }
-
 
     /**
      * Get list of species in square
