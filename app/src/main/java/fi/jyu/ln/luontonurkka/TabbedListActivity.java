@@ -57,9 +57,6 @@ import fi.jyu.ln.luontonurkka.tools.DatabaseHelper;
 
 public class TabbedListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<LocationSettingsResult>, com.google.android.gms.location.LocationListener {
 
-    // TODO remove
-    private long startTime;
-
     private static SpeciesLists speciesInSquare;
     private static final int LIST_LENGTH = 30;
     private int[] lastLocationYKJ = {0, 0};
@@ -111,7 +108,6 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        startTime = System.currentTimeMillis();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabbed);
 
