@@ -266,34 +266,56 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             // Return a ListFragment (defined as a static inner class below).
 
             if (position == 1) {
-                return ListFragment.newInstance(position, new ArrayList<Species>(speciesInSquare.getBirds().subList(0, LIST_LENGTH)));
-            } else if (position == 2) {
-                return ListFragment.newInstance(position, new ArrayList<Species>(speciesInSquare.getPlants().subList(0, LIST_LENGTH)));
-            } else {
-                long t = System.currentTimeMillis();
-                List<Species> all = speciesInSquare.getAll();
-                List<Species> randomized = new ArrayList<>(LIST_LENGTH);
-                Random random = new Random();
-                int next = random.nextInt(all.size() * 75);
-                Species s;
-                int i = 0;
-                while (randomized.size() < LIST_LENGTH) {
-                    s = all.get(i);
-                    next -= s.getFreq();
-                    if (next < 0) {
-                        randomized.add(s);
-                        next = random.nextInt(all.size() * 75);
-                    }
-                    i++;
-                    if (i >= all.size())
-                        i = 0;
-                }
-
-                Log.d("AIKA", (System.currentTimeMillis() - t) / 1000f + " s");
-
+                List<Species> birds = speciesInSquare.getBirds();
+                List<Species> randomized = getRandomized(birds);
                 return ListFragment.newInstance(position, randomized);
-                //return ListFragment.newInstance(position, new ArrayList<Species>(speciesInSquare.getAll().subList(0, LIST_LENGTH)));
+            } else if (position == 2) {
+                List<Species> plants = speciesInSquare.getPlants();
+                List<Species> randomized = getRandomized(plants);
+                return ListFragment.newInstance(position, randomized);
+            } else {
+                List<Species> all = speciesInSquare.getAll();
+                List<Species> randomized = getRandomized(all);
+                return ListFragment.newInstance(position, randomized);
             }
+        }
+
+        // gets randomized sublist from species list
+        // species with higher frequency have higher change
+        // to be in the list
+        private List<Species> getRandomized(List<Species> list) {
+            // check that list is long enough
+            if(list.size() < LIST_LENGTH)
+                // if not return same list
+                return list;
+
+            // init random list
+            List<Species> randomized = new ArrayList<>(LIST_LENGTH);
+            Random random = new Random();
+            // get first random
+            int next = random.nextInt(list.size() * 100);
+            // init species
+            Species s;
+            // index
+            int i = 0;
+            // pick randomply until LIST_LENGTH species picked
+            while (randomized.size() < LIST_LENGTH) {
+                s = list.get(i);
+                // subtract species frequency from 'next'
+                // if 'next' is negative add 's' to list
+                next -= s.getFreq();
+                if (next < 0) {
+                    // do not add same twice
+                    if(!randomized.contains(s))
+                        randomized.add(s);
+                    next = random.nextInt(list.size() * 100);
+                }
+                // loop the list
+                i++;
+                if (i >= list.size())
+                    i = 0;
+            }
+            return randomized;
         }
 
         @Override
