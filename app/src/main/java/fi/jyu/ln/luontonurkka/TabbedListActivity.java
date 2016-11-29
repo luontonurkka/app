@@ -50,7 +50,11 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.nearby.messages.internal.Update;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Random;
 
 import fi.jyu.ln.luontonurkka.tools.CoordinateConverter;
 import fi.jyu.ln.luontonurkka.tools.DatabaseHelper;
@@ -258,12 +262,56 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             // Return a ListFragment (defined as a static inner class below).
 
             if (position == 1) {
-                return ListFragment.newInstance(position, new ArrayList<Species>(speciesInSquare.getBirds().subList(0, LIST_LENGTH)));
+                List<Species> birds = speciesInSquare.getBirds();
+                List<Species> randomized = getRandomized(birds);
+                return ListFragment.newInstance(position, randomized);
             } else if (position == 2) {
-                return ListFragment.newInstance(position, new ArrayList<Species>(speciesInSquare.getPlants().subList(0, LIST_LENGTH)));
+                List<Species> plants = speciesInSquare.getPlants();
+                List<Species> randomized = getRandomized(plants);
+                return ListFragment.newInstance(position, randomized);
             } else {
-                return ListFragment.newInstance(position, new ArrayList<Species>(speciesInSquare.getAll().subList(0, LIST_LENGTH)));
+                List<Species> all = speciesInSquare.getAll();
+                List<Species> randomized = getRandomized(all);
+                return ListFragment.newInstance(position, randomized);
             }
+        }
+
+        // gets randomized sublist from species list
+        // species with higher frequency have higher change
+        // to be in the list
+        private List<Species> getRandomized(List<Species> list) {
+            // check that list is long enough
+            if(list.size() < LIST_LENGTH)
+                // if not return same list
+                return list;
+
+            // init random list
+            List<Species> randomized = new ArrayList<>(LIST_LENGTH);
+            Random random = new Random();
+            // get first random
+            int next = random.nextInt(list.size() * 100);
+            // init species
+            Species s;
+            // index
+            int i = 0;
+            // pick randomply until LIST_LENGTH species picked
+            while (randomized.size() < LIST_LENGTH) {
+                s = list.get(i);
+                // subtract species frequency from 'next'
+                // if 'next' is negative add 's' to list
+                next -= s.getFreq();
+                if (next < 0) {
+                    // do not add same twice
+                    if(!randomized.contains(s))
+                        randomized.add(s);
+                    next = random.nextInt(list.size() * 100);
+                }
+                // loop the list
+                i++;
+                if (i >= list.size())
+                    i = 0;
+            }
+            return randomized;
         }
 
         @Override
