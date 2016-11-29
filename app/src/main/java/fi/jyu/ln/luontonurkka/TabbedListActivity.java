@@ -50,7 +50,11 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.nearby.messages.internal.Update;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Random;
 
 import fi.jyu.ln.luontonurkka.tools.CoordinateConverter;
 import fi.jyu.ln.luontonurkka.tools.DatabaseHelper;
@@ -266,7 +270,29 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             } else if (position == 2) {
                 return ListFragment.newInstance(position, new ArrayList<Species>(speciesInSquare.getPlants().subList(0, LIST_LENGTH)));
             } else {
-                return ListFragment.newInstance(position, new ArrayList<Species>(speciesInSquare.getAll().subList(0, LIST_LENGTH)));
+                long t = System.currentTimeMillis();
+                List<Species> all = speciesInSquare.getAll();
+                List<Species> randomized = new ArrayList<>(LIST_LENGTH);
+                Random random = new Random();
+                int next = random.nextInt(all.size() * 75);
+                Species s;
+                int i = 0;
+                while (randomized.size() < LIST_LENGTH) {
+                    s = all.get(i);
+                    next -= s.getFreq();
+                    if (next < 0) {
+                        randomized.add(s);
+                        next = random.nextInt(all.size() * 75);
+                    }
+                    i++;
+                    if (i >= all.size())
+                        i = 0;
+                }
+
+                Log.d("AIKA", (System.currentTimeMillis() - t) / 1000f + " s");
+
+                return ListFragment.newInstance(position, randomized);
+                //return ListFragment.newInstance(position, new ArrayList<Species>(speciesInSquare.getAll().subList(0, LIST_LENGTH)));
             }
         }
 
