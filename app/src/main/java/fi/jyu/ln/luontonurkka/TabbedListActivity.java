@@ -66,6 +66,8 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
     private int[] lastLocationYKJ = {0, 0};
     private GoogleApiClient apiClient;
 
+    private boolean openedFromMapView;
+
     private Location lastLocation;
     /* Location Constant Permissions */
     private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
@@ -124,7 +126,8 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         Intent intent = getIntent();
 
         //if list view was opened from map activity
-        if (intent.getBooleanExtra(MapsActivity.FROM_MAP_VIEW, false)) {
+        openedFromMapView = intent.getBooleanExtra(MapsActivity.FROM_MAP_VIEW, false);
+        if (openedFromMapView) {
             //if came to list view from map view, don't update location
             requestingLocationUpdates = false;
             lastLocationYKJ = CoordinateConverter.WGSToYKJ(intent.getDoubleExtra(MapsActivity.ARG_NORTH_COORD, 62.2141), intent.getDoubleExtra(MapsActivity.ARG_EAST_COORD, 25.7126));
@@ -701,33 +704,34 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         Thread thread = new Thread() {
             @Override
             public void run() {
-                if (lastLocation == null) {
-                    // Ask user for permission to use coarse location
-                    Log.i(activity.getLocalClassName(), "Check the permission to use location.");
-                    if (ContextCompat.checkSelfPermission(activity.getApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        Log.i(activity.getLocalClassName(), "Request a permission to use location.");
-                        ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSION_ACCESS_COARSE_LOCATION);
+                //If list view was not opened from map view, ask user to grant permission to use location and check location settings and start updating location
+                if (!openedFromMapView) {
+                    if (lastLocation == null) {
+                        // Ask user for permission to use coarse location
+                        Log.i(activity.getLocalClassName(), "Check the permission to use location.");
+                        if (ContextCompat.checkSelfPermission(activity.getApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            Log.i(activity.getLocalClassName(), "Request a permission to use location.");
+                            ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSION_ACCESS_COARSE_LOCATION);
+                        } else {
+                            Log.i(activity.getLocalClassName(), "Permission to use location already granted.");
+                            //check location settings
+                            checkLocationSettings();
+
+                            // Get last location
+                            lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
+                            UpdateListTask task = new UpdateListTask();
+                            task.execute(new Void[0]);
+
+                            // Start location updates
+                            if (requestingLocationUpdates) {
+                                startLocationUpdates();
+                            }
+                        }
                     } else {
-                        Log.i(activity.getLocalClassName(), "Permission to use location already granted.");
-                        //check location settings
-                        checkLocationSettings();
-
-                        // Get last location
-
-                        lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
-                        UpdateListTask task = new UpdateListTask();
-                        task.execute(new Void[0]);
-
                         // Start location updates
                         if (requestingLocationUpdates) {
                             startLocationUpdates();
                         }
-                    }
-                }
-                else {
-                    // Start location updates
-                    if (requestingLocationUpdates) {
-                        startLocationUpdates();
                     }
                 }
             }
