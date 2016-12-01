@@ -642,17 +642,17 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
     /**
      * Requests location updates from the FusedLocationApi.
      */
-    protected void startLocationUpdates() {
+    protected void startLocationUpdates() throws SecurityException{
         Log.i(this.getLocalClassName(), "Start location updates.");
 
-        Log.i(this.getLocalClassName(), "Check the permission to use location.");
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.i(this.getLocalClassName(), "Request a permission to use location.");
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSION_ACCESS_COARSE_LOCATION);
-        } else {
-            Log.i(this.getLocalClassName(), "Permission to use location already granted.");
-            //check location settings
-//            checkLocationSettings();
+//        Log.i(this.getLocalClassName(), "Check the permission to use location.");
+//        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            Log.i(this.getLocalClassName(), "Request a permission to use location.");
+//            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSION_ACCESS_COARSE_LOCATION);
+//        } else {
+//            Log.i(this.getLocalClassName(), "Permission to use location already granted.");
+//            //check location settings
+////            checkLocationSettings();
 
             LocationServices.FusedLocationApi.requestLocationUpdates(
                     apiClient,
@@ -664,7 +664,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                     requestingLocationUpdates = true;
                 }
             });
-        }
+//        }
 
         Log.i(this.getLocalClassName(), "Location check done.");
     }
