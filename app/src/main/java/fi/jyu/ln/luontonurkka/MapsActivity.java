@@ -195,8 +195,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         map.clear();
         locationMarker = map.addMarker(new MarkerOptions()
                 .position(point)
-                .title("Title")
-                .snippet("Snippet")
+                .anchor(0.5f, 0.5f)
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_show_species)));
 //        locationMarker.showInfoWindow();
     }
