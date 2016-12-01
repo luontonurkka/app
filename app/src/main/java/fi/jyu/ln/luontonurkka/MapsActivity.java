@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -31,11 +33,12 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<LocationSettingsResult> {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<LocationSettingsResult>, GoogleMap.OnMarkerClickListener {
     private GoogleMap map;
     private Marker locationMarker;
     private GoogleApiClient apiClient;
@@ -166,7 +169,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //center map on Finland
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(65.551806, 26.305592), 5));
         map.setOnMapClickListener(this);
-        map.setOnInfoWindowClickListener(this);
+//        map.setOnInfoWindowClickListener(this);
+        map.setOnMarkerClickListener(this);
 
         Log.i(this.getLocalClassName(), "Check the permission to use location.");
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -193,13 +197,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .position(point)
                 .title("Title")
                 .snippet("Snippet")
-                .infoWindowAnchor(0.5f, 0.5f));
-        locationMarker.showInfoWindow();
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_show_species)));
+//        locationMarker.showInfoWindow();
     }
 
     /**
-     * Called when user clicks infowindow
-     * @param marker Marker of the infowindow
+     * Called when user clicks info window
+     * @param marker Marker of the info window
      */
     @Override
     public void onInfoWindowClick(Marker marker) {
@@ -208,6 +212,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         intent.putExtra(ARG_EAST_COORD, clickedPoint.longitude);
         intent.putExtra(FROM_MAP_VIEW, true);
         startActivity(intent);
+    }
+
+    /**
+     * Called when user clicks marker
+     * @param marker Marker clicked
+     * @return Suppress the default behaviour (centering the map and opening an info window)
+     */
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Intent intent = new Intent(this, TabbedListActivity.class);
+        intent.putExtra(ARG_NORTH_COORD, clickedPoint.latitude);
+        intent.putExtra(ARG_EAST_COORD, clickedPoint.longitude);
+        intent.putExtra(FROM_MAP_VIEW, true);
+        startActivity(intent);
+        return true;
     }
 
     /**
