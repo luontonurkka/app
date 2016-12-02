@@ -99,6 +99,8 @@ public class SpeciesActivity extends AppCompatActivity {
 
         wikiButton.setVisibility(View.VISIBLE);
         textView.setVisibility(View.VISIBLE);
+
+        setFrequencyVisible(species);
     }
 
     private void setImgComplete(Bitmap img) {
@@ -106,5 +108,22 @@ public class SpeciesActivity extends AppCompatActivity {
         ImageView imgView = (ImageView)findViewById(R.id.species_toolbar_img);
         imgView.setImageBitmap(speciesImg);
         imgView.setVisibility(View.VISIBLE);
+    }
+
+    private void setFrequencyVisible(Species s) {
+        // find indicator circles
+        ImageView[] freqs = {
+                (ImageView)findViewById(R.id.freq_1),
+                (ImageView)findViewById(R.id.freq_2),
+                (ImageView)findViewById(R.id.freq_3),
+                (ImageView)findViewById(R.id.freq_4)
+        };
+        // normalize freq to [0,...,4]
+        int f = Math.round(s.getFreq() / 25f);
+        // change indicator icons and show them
+        for(int i = 0; i < f; i++) {
+            freqs[i].setImageResource(R.drawable.circle_filled);
+        }
+        findViewById(R.id.freq_layout).setVisibility(View.VISIBLE);
     }
 }
