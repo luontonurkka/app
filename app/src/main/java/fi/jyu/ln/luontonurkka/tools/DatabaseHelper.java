@@ -302,11 +302,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             while (c.moveToNext()) {
                 s = getSpeciesById(c.getInt(c.getColumnIndex(KEY_SPEC_ID)), c.getInt(c.getColumnIndex(KEY_FREQ)));
-                if (s.getType() == Species.BIRD) {
-                    birdsInSquare.add(s);
-                }
-                else {
-                    plantsInSquare.add(s);
+                if (s != null) {
+                    if (s.getType() == Species.BIRD) {
+                        birdsInSquare.add(s);
+                    } else {
+                        plantsInSquare.add(s);
+                    }
                 }
             }
         }
@@ -329,22 +330,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String whereClause = KEY_ID + " = ?";
         String[] whereArgs = new String[] {Integer.toString(speciesId)};
 
-        Species s;
+        Species s = null;
         try (SQLiteDatabase db = getWritableDatabase(); Cursor c = db.query(TABLE_SPECIES, tableColumns, whereClause, whereArgs, null, null, null);) {
             c.moveToNext();
-            String name = c.getString(c.getColumnIndex(KEY_NAME_FIN));
-            if (name.isEmpty() || name == null) {
-                name = c.getString(c.getColumnIndex(KEY_NAME_LATIN));
-            }
-            s = new Species.SpeciesBuilder(
-                    name,
+            if (c.getCount() > 0) {
+                String name = c.getString(c.getColumnIndex(KEY_NAME_FIN));
+                if (name.isEmpty() || name == null) {
+                    name = c.getString(c.getColumnIndex(KEY_NAME_LATIN));
+                }
+                s = new Species.SpeciesBuilder(
+                        name,
 //                    c.getString(c.getColumnIndex(KEY_NAME_LATIN)),
-                    c.getInt(c.getColumnIndex(KEY_TYPE)))
-                    .setWikiIdFin(Integer.toString(c.getInt(c.getColumnIndex(KEY_WIKI_FI))))
-                    .setWikiIdEng(Integer.toString(c.getInt(c.getColumnIndex(KEY_WIKI_EN))))
-                    .setImageUrl(c.getString(c.getColumnIndex(KEY_PIC)))
-                    .setFreq(freq)
-                    .build();
+                        c.getInt(c.getColumnIndex(KEY_TYPE)))
+                        .setWikiIdFin(Integer.toString(c.getInt(c.getColumnIndex(KEY_WIKI_FI))))
+                        .setWikiIdEng(Integer.toString(c.getInt(c.getColumnIndex(KEY_WIKI_EN))))
+                        .setImageUrl(c.getString(c.getColumnIndex(KEY_PIC)))
+                        .setFreq(freq)
+                        .build();
+            }
         }
 
         return s;
