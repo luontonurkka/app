@@ -14,18 +14,51 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <LinearLayout
+            android:id="@+id/freq_layout"
+            android:layout_margin="@dimen/text_margin_half"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true">
+            <ImageView
+                android:layout_margin="5dp"
+                android:id="@+id/freq_1"
+                android:src="@drawable/circle_outline"
+                android:layout_width="30dp"
+                android:layout_height="30dp" />
+            <ImageView
+                android:layout_margin="5dp"
+                android:id="@+id/freq_2"
+                android:src="@drawable/circle_outline"
+                android:layout_width="30dp"
+                android:layout_height="30dp" />
+            <ImageView
+                android:layout_margin="5dp"
+                android:id="@+id/freq_3"
+                android:src="@drawable/circle_outline"
+                android:layout_width="30dp"
+                android:layout_height="30dp" />
+            <ImageView
+                android:layout_margin="5dp"
+                android:id="@+id/freq_4"
+                android:src="@drawable/circle_outline"
+                android:layout_width="30dp"
+                android:layout_height="30dp" />
+        </LinearLayout>
+
         <TextView
+            android:layout_below="@id/freq_layout"
             android:id="@+id/species_content_text"
             android:visibility="invisible"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
+            android:layout_margin="@dimen/text_margin_half"
             android:text="@string/species_desc" />
 
         <Button
             android:layout_below="@id/species_content_text"
             android:visibility="invisible"
-            android:layout_margin="@dimen/text_margin"
+            android:layout_margin="@dimen/text_margin_half"
             android:layout_marginTop="0dp"
             android:text="@string/read_more_wiki"
             android:id="@+id/species_content_button_wiki"
