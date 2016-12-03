@@ -106,8 +106,11 @@ public class SpeciesActivity extends AppCompatActivity {
     private void setImgComplete(Bitmap img) {
         speciesImg = img;
         ImageView imgView = (ImageView)findViewById(R.id.species_toolbar_img);
+        ImageView bigView = (ImageView)findViewById(R.id.big_image);
         imgView.setImageBitmap(speciesImg);
+        bigView.setImageBitmap(speciesImg);
         imgView.setVisibility(View.VISIBLE);
+        findViewById(R.id.species_maximize_img).setVisibility(View.VISIBLE);
     }
 
     private void setFrequencyVisible(Species s) {
@@ -125,5 +128,13 @@ public class SpeciesActivity extends AppCompatActivity {
             freqs[i].setImageResource(R.drawable.circle_filled);
         }
         findViewById(R.id.freq_layout).setVisibility(View.VISIBLE);
+    }
+
+    public void openImage(View view) {
+        findViewById(R.id.big_image).setVisibility(View.VISIBLE);
+    }
+
+    public void closeImage(View view) {
+        findViewById(R.id.big_image).setVisibility(View.INVISIBLE);
     }
 }

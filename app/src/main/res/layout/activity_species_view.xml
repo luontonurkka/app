@@ -26,7 +26,18 @@
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:adjustViewBounds="true"
-                android:scaleType="centerCrop"/>
+                android:scaleType="centerCrop"
+                android:onClick="openImage"/>
+
+            <ImageView
+                android:id="@+id/species_maximize_img"
+                android:visibility="invisible"
+                android:src="@drawable/ic_zoom_out_map_white_48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginRight="@dimen/text_margin"
+                android:layout_marginBottom="@dimen/text_margin"
+                android:layout_gravity="bottom|right" />
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -39,4 +50,14 @@
 
     <include layout="@layout/content_species_view" />
 
+    <ImageView
+        android:visibility="invisible"
+        android:background="#A0000000"
+        android:id="@+id/big_image"
+        android:scaleType="fitCenter"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:onClick="closeImage"/>
+
 </android.support.design.widget.CoordinatorLayout>
+
