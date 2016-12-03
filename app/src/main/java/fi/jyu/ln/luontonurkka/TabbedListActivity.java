@@ -733,6 +733,8 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                             startLocationUpdates();
                         }
                     }
+                } else {
+                    findViewById(R.id.list_loading).setVisibility(View.INVISIBLE);
                 }
             }
         };
