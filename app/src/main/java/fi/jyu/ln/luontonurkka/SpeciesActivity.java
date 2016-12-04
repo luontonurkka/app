@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -45,10 +46,10 @@ public class SpeciesActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         // get species from intent
-        species = (Species)getIntent().getSerializableExtra("Species");
+        species = (Species) getIntent().getSerializableExtra("Species");
 
         // set title to species name
-        CollapsingToolbarLayout layout = (CollapsingToolbarLayout)this.findViewById(species_toolbar_layout);
+        CollapsingToolbarLayout layout = (CollapsingToolbarLayout) this.findViewById(species_toolbar_layout);
         layout.setTitle(species.getName());
         layout.setExpandedTitleColor(Color.WHITE);
         layout.setCollapsedTitleTextColor(Color.WHITE);
@@ -56,7 +57,7 @@ public class SpeciesActivity extends AppCompatActivity {
         // TODO ids wrongway around
         pageId = species.getIdEng();
         lang = "fi";
-        if(pageId.length() < 1) {
+        if (pageId.length() < 1) {
             pageId = species.getIdFin();
             lang = "en";
         }
@@ -64,20 +65,23 @@ public class SpeciesActivity extends AppCompatActivity {
         OnTaskCompleted task = new OnTaskCompleted() {
             @Override
             public void onTaskCompleted(String result) {
-                if(result != null)
+                if (result != null)
                     setTextComplete(result);
             }
 
             @Override
             public void onTaskCompleted(Bitmap result) {
-                if(result != null)
+                if (result != null)
                     setImgComplete(result);
             }
         };
         WikiFetcher.getWikiDescription(pageId, task, lang);
 
-        if (species.getImgUrl().length() > 0)
+        if (species.getImgUrl().length() > 0) {
             new DownloadImageTask(task).execute(species.getImgUrl());
+        } else {
+            ((ProgressBar) findViewById(R.id.image_progress)).setVisibility(View.INVISIBLE);
+        }
     }
 
     protected void openWikiPage(View view) {
@@ -111,6 +115,8 @@ public class SpeciesActivity extends AppCompatActivity {
         bigView.setImageBitmap(speciesImg);
         imgView.setVisibility(View.VISIBLE);
         findViewById(R.id.species_maximize_img).setVisibility(View.VISIBLE);
+        Log.d(getClass().toString(), findViewById(R.id.image_progress) == null ? "null" : "not null");
+        ((ProgressBar)findViewById(R.id.image_progress)).setVisibility(View.INVISIBLE);
     }
 
     private void setFrequencyVisible(Species s) {
@@ -136,5 +142,14 @@ public class SpeciesActivity extends AppCompatActivity {
 
     public void closeImage(View view) {
         findViewById(R.id.big_image).setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void onBackPressed() {
+        // if zoomed image is visible back button closes image
+        if(findViewById(R.id.big_image).getVisibility() == View.VISIBLE)
+            closeImage(null);
+        else
+            super.onBackPressed();
     }
 }
