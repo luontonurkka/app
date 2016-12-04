@@ -23,6 +23,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -183,7 +184,10 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
          */
         private static final String ARG_SPECIES_LIST = "species_list";
 
+        private ArrayList<Species> species;
+
         public ListFragment() {
+
         }
 
         /**
@@ -201,16 +205,69 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.activity_list, container, false);
+            final View rootView = inflater.inflate(R.layout.activity_list, container, false);
 
-            ArrayList<Species> speciesList = (ArrayList<Species>) getArguments().getSerializable(ARG_SPECIES_LIST);
+            final ViewGroup cont = container;
 
-            SpeciesListAdapter sla = new SpeciesListAdapter(container.getContext(), speciesList);
+            // listen to drag refresh events
+            ((SwipeRefreshLayout)rootView).setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    // get new randomized list
+                    SpeciesListAdapter sla = new SpeciesListAdapter(cont.getContext(), getRandomized(species));
+
+                    ListView listView = (ListView) rootView.findViewById(R.id.species_list);
+                    listView.setAdapter(sla);
+                    ((SwipeRefreshLayout)rootView).setRefreshing(false);
+                }
+            });
+
+            species = (ArrayList<Species>) getArguments().getSerializable(ARG_SPECIES_LIST);
+
+            SpeciesListAdapter sla = new SpeciesListAdapter(container.getContext(), getRandomized(species));
 
             ListView listView = (ListView) rootView.findViewById(R.id.species_list);
             listView.setAdapter(sla);
 
             return rootView;
+        }
+
+        // gets randomized sublist from species list
+        // species with higher frequency have higher change
+        // to be in the list
+        private ArrayList<Species> getRandomized(ArrayList<Species> list) {
+            // check that list is long enough
+            if(list.size() < LIST_LENGTH)
+                // if not return same list
+                return list;
+
+            // init random list
+            ArrayList<Species> randomized = new ArrayList<>(LIST_LENGTH);
+            Random random = new Random();
+            // get first random
+            int next = random.nextInt(list.size() * 100);
+            // init species
+            Species s;
+            // index
+            int i = 0;
+            // pick randomply until LIST_LENGTH species picked
+            while (randomized.size() < LIST_LENGTH) {
+                s = list.get(i);
+                // subtract species frequency from 'next'
+                // if 'next' is negative add 's' to list
+                next -= s.getFreq();
+                if (next < 0) {
+                    // do not add same twice
+                    if(!randomized.contains(s))
+                        randomized.add(s);
+                    next = random.nextInt(list.size() * 100);
+                }
+                // loop the list
+                i++;
+                if (i >= list.size())
+                    i = 0;
+            }
+            return randomized;
         }
 
         private class SpeciesListAdapter extends ArrayAdapter {
@@ -265,56 +322,12 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             // Return a ListFragment (defined as a static inner class below).
 
             if (position == 1) {
-                List<Species> birds = speciesInSquare.getBirds();
-                List<Species> randomized = getRandomized(birds);
-                return ListFragment.newInstance(position, randomized);
+                return ListFragment.newInstance(position, speciesInSquare.getBirds());
             } else if (position == 2) {
-                List<Species> plants = speciesInSquare.getPlants();
-                List<Species> randomized = getRandomized(plants);
-                return ListFragment.newInstance(position, randomized);
+                return ListFragment.newInstance(position, speciesInSquare.getPlants());
             } else {
-                List<Species> all = speciesInSquare.getAll();
-                List<Species> randomized = getRandomized(all);
-                return ListFragment.newInstance(position, randomized);
+                return ListFragment.newInstance(position, speciesInSquare.getAll());
             }
-        }
-
-        // gets randomized sublist from species list
-        // species with higher frequency have higher change
-        // to be in the list
-        private List<Species> getRandomized(List<Species> list) {
-            // check that list is long enough
-            if(list.size() < LIST_LENGTH)
-                // if not return same list
-                return list;
-
-            // init random list
-            List<Species> randomized = new ArrayList<>(LIST_LENGTH);
-            Random random = new Random();
-            // get first random
-            int next = random.nextInt(list.size() * 100);
-            // init species
-            Species s;
-            // index
-            int i = 0;
-            // pick randomply until LIST_LENGTH species picked
-            while (randomized.size() < LIST_LENGTH) {
-                s = list.get(i);
-                // subtract species frequency from 'next'
-                // if 'next' is negative add 's' to list
-                next -= s.getFreq();
-                if (next < 0) {
-                    // do not add same twice
-                    if(!randomized.contains(s))
-                        randomized.add(s);
-                    next = random.nextInt(list.size() * 100);
-                }
-                // loop the list
-                i++;
-                if (i >= list.size())
-                    i = 0;
-            }
-            return randomized;
         }
 
         @Override
