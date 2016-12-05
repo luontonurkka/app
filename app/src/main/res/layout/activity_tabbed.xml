@@ -78,13 +78,12 @@
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        <ProgressBar
-            style="?android:attr/progressBarStyle"
-            android:layout_margin="70dp"
+        <ImageView
+            android:layout_margin="80dp"
+            android:id="@+id/list_loading"
+            android:src="@drawable/loading_icon"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/list_loading" />
+            android:layout_height="match_parent" />
 
         <android.support.design.widget.FloatingActionButton
             android:src="@drawable/ic_map"

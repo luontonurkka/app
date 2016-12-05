@@ -31,6 +31,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -48,13 +50,9 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.google.android.gms.nearby.messages.internal.Update;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Random;
 
 import fi.jyu.ln.luontonurkka.tools.CoordinateConverter;
@@ -172,6 +170,10 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             @Override
             public void onPageScrollStateChanged(int state) { }
         });
+
+        Animation rotation = AnimationUtils.loadAnimation(this, R.anim.spinning);
+        rotation.setRepeatCount(Animation.INFINITE);
+        findViewById(R.id.list_loading).setAnimation(rotation);
     }
 
     /**
@@ -747,7 +749,13 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                         }
                     }
                 } else {
-                    findViewById(R.id.list_loading).setVisibility(View.INVISIBLE);
+                    // cant set invisible if animation is set
+                    View view = findViewById(R.id.list_loading);
+                    if(view.getAnimation() != null) {
+                        view.getAnimation().cancel();
+                        view.setAnimation(null);
+                    }
+                    view.setVisibility(View.INVISIBLE);
                 }
             }
         };
@@ -859,7 +867,14 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                         @Override
                         public void run() {
                             mViewPager.setAdapter(mSectionsPagerAdapter);
-                            findViewById(R.id.list_loading).setVisibility(View.INVISIBLE);
+
+                            // cant set invisible if animation is set
+                            View view = findViewById(R.id.list_loading);
+                            if(view.getAnimation() != null) {
+                                view.getAnimation().cancel();
+                                view.setAnimation(null);
+                            }
+                            view.setVisibility(View.INVISIBLE);
                         }
                     });
                     lastLocationYKJ = ykj;
