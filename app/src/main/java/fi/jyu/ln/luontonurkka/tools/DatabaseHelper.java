@@ -47,6 +47,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static String KEY_SPEC_ID = "sid";
     private static String KEY_NORTH = "N";
     private static String KEY_EAST = "E";
+    private static String KEY_SQ_NAME = "sqrname";
     private static String KEY_NAME_LATIN = "namelatin";
     private static String KEY_NAME_FIN = "namefin";
     private static String KEY_TYPE = "type";
@@ -351,5 +352,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return s;
+    }
+
+    /**
+     * Get square name from database according to coordinates.
+     * @param n North YKJ coordinate
+     * @param e East YKJ coordinate
+     * @return square name
+     */
+    public String getSquareName(int n, int e) {
+        String[] tableColumns = new String[] {KEY_NORTH, KEY_EAST, KEY_SQ_NAME};
+        String whereClause = KEY_NORTH + " = ? AND " + KEY_EAST + " = ?";
+        String[] whereArgs = new String[] {Integer.toString(n), Integer.toString(e)};
+
+        String squareName = "";
+        try (SQLiteDatabase db = getWritableDatabase(); Cursor c = db.query(TABLE_GRID, tableColumns, whereClause, whereArgs, null, null, null);) {
+            c.moveToFirst();
+            squareName = c.getString(c.getColumnIndex(KEY_SQ_NAME));
+        }
+        return squareName;
     }
 }
