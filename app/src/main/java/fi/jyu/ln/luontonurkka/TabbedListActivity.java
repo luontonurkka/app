@@ -64,6 +64,7 @@ import fi.jyu.ln.luontonurkka.tools.DatabaseHelper;
 public class TabbedListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<LocationSettingsResult>, com.google.android.gms.location.LocationListener {
 
     private static SpeciesLists speciesInSquare;
+    private static String squareName;
     private static final int LIST_LENGTH = 30;
     private int[] lastLocationYKJ = {0, 0};
     private GoogleApiClient apiClient;
@@ -140,7 +141,6 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             lastLocationYKJ = CoordinateConverter.WGSToYKJ(intent.getDoubleExtra(MapsActivity.ARG_NORTH_COORD, 62.2141), intent.getDoubleExtra(MapsActivity.ARG_EAST_COORD, 25.7126));
             //TODO Decide on default coordinates
             speciesInSquare = getSpeciesList(intent.getDoubleExtra(MapsActivity.ARG_NORTH_COORD, 62.2141), intent.getDoubleExtra(MapsActivity.ARG_EAST_COORD, 25.7126));
-
         } else {
             requestingLocationUpdates = true;
             //set my location button invisible and map button visible
@@ -154,6 +154,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         // primary sections of the activity.
         if (speciesInSquare != null) {
             mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+            ((TextView) findViewById(R.id.square_name)).setText(squareName);
         }
 
         // Set up the ViewPager with the sections adapter.
@@ -893,6 +894,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                         public void run() {
                             mViewPager.setAdapter(mSectionsPagerAdapter);
                             findViewById(R.id.list_loading).setVisibility(View.INVISIBLE);
+                            ((TextView) findViewById(R.id.square_name)).setText(squareName);
                         }
                     });
                     lastLocationYKJ = ykj;
@@ -918,6 +920,9 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             //fetch list from database according to YKJ coordinates
             int[] ykjCoord = CoordinateConverter.WGSToYKJ(n, e);
             speciesInSquare = myDbHelper.getSpeciesInSquare(ykjCoord[0] / 10000, ykjCoord[1] / 10000);
+
+            //fetch the name of the square
+            squareName = myDbHelper.getSquareName(ykjCoord[0] / 10000, ykjCoord[1] / 10000);
         } catch (Exception ex) {
             //TODO
             ex.printStackTrace();

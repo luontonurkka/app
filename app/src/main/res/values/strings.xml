@@ -5,7 +5,7 @@
         "Short description of the species."
     </string>
     <string name="action_settings">Settings</string>
-    <string name="read_more_wiki">Lue lisää wikipediasta</string>
+    <string name="read_more_wiki">Lue lisää Wikipediasta</string>
     <string name="title_activity_tabbed">Luontonurkka App</string>
     <string name="tab_all">Kaikki</string>
     <string name="tab_birds">Linnut</string>
