@@ -11,6 +11,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -129,6 +130,9 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         //if list view was opened from map activity
         openedFromMapView = intent.getBooleanExtra(MapsActivity.FROM_MAP_VIEW, false);
         if (openedFromMapView) {
+            //set my location button visible and map button invisible
+            ((FloatingActionButton) findViewById(R.id.ic_my_location)).setVisibility(View.VISIBLE);
+            ((FloatingActionButton) findViewById(R.id.ic_map)).setVisibility(View.INVISIBLE);
             //if came to list view from map view, don't update location
             requestingLocationUpdates = false;
             lastLocationYKJ = CoordinateConverter.WGSToYKJ(intent.getDoubleExtra(MapsActivity.ARG_NORTH_COORD, 62.2141), intent.getDoubleExtra(MapsActivity.ARG_EAST_COORD, 25.7126));
@@ -136,6 +140,9 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             speciesInSquare = getSpeciesList(intent.getDoubleExtra(MapsActivity.ARG_NORTH_COORD, 62.2141), intent.getDoubleExtra(MapsActivity.ARG_EAST_COORD, 25.7126));
         } else {
             requestingLocationUpdates = true;
+            //set my location button invisible and map button visible
+            ((FloatingActionButton) findViewById(R.id.ic_map)).setVisibility(View.VISIBLE);
+            ((FloatingActionButton) findViewById(R.id.ic_my_location)).setVisibility(View.INVISIBLE);
         }
 
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

@@ -87,6 +87,7 @@
             android:id="@+id/list_loading" />
 
         <android.support.design.widget.FloatingActionButton
+            android:id="@+id/ic_map"
             android:src="@drawable/ic_map"
             app:fabSize="normal"
             android:layout_width="wrap_content"
@@ -95,6 +96,18 @@
             app:layout_anchor="@id/list_pager"
             app:layout_anchorGravity="bottom|right|end"
             android:onClick="onMapButtonClick"
+            />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/ic_my_location"
+            android:src="@drawable/ic_my_location"
+            app:fabSize="normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:layout_anchor="@id/list_pager"
+            app:layout_anchorGravity="bottom|right|end"
+            android:onClick="onMyLocationButtonClick"
             />
 
     </android.support.design.widget.CoordinatorLayout>
