@@ -29,6 +29,12 @@
                 android:scaleType="centerCrop"
                 android:onClick="openImage"/>
 
+            <ImageView
+                android:layout_gravity="bottom"
+                android:src="@drawable/gradient_dark"
+                android:layout_width="match_parent"
+                android:layout_height="80dp" />
+
             <ProgressBar
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:progress="50"

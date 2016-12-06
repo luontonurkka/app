@@ -26,6 +26,15 @@
             android:paddingTop="@dimen/appbar_padding_top"
             android:theme="@style/AppTheme.AppBarOverlay">
 
+            <TextView
+                android:id="@+id/square_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:maxLines="1"
+                android:layout_margin="@dimen/text_margin_half"
+                android:textSize="25sp"/>
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -86,6 +95,7 @@
             android:layout_height="match_parent" />
 
         <android.support.design.widget.FloatingActionButton
+            android:id="@+id/ic_map"
             android:src="@drawable/ic_map"
             app:fabSize="normal"
             android:layout_width="wrap_content"
@@ -94,6 +104,18 @@
             app:layout_anchor="@id/list_pager"
             app:layout_anchorGravity="bottom|right|end"
             android:onClick="onMapButtonClick"
+            />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/ic_my_location"
+            android:src="@drawable/ic_my_location"
+            app:fabSize="normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:layout_anchor="@id/list_pager"
+            app:layout_anchorGravity="bottom|right|end"
+            android:onClick="onMyLocationButtonClick"
             />
 
     </android.support.design.widget.CoordinatorLayout>

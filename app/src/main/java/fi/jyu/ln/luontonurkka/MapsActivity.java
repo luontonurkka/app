@@ -38,6 +38,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import fi.jyu.ln.luontonurkka.tools.CoordinateConverter;
+import fi.jyu.ln.luontonurkka.tools.DatabaseHelper;
+
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<LocationSettingsResult>, GoogleMap.OnMarkerClickListener {
     private GoogleMap map;
     private Marker locationMarker;
@@ -169,7 +172,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //center map on Finland
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(65.551806, 26.305592), 5));
         map.setOnMapClickListener(this);
-//        map.setOnInfoWindowClickListener(this);
+        map.setOnInfoWindowClickListener(this);
         map.setOnMarkerClickListener(this);
 
         Log.i(this.getLocalClassName(), "Check the permission to use location.");
@@ -192,12 +195,33 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapClick(LatLng point) {
         clickedPoint = point;
 
+        //fetch square name from database
+        DatabaseHelper myDbHelper = DatabaseHelper.getInstance(this);
+        myDbHelper.initializeDataBase();
+        String squareName = "";
+        try {
+            //fetch list from database according to YKJ coordinates
+            int[] ykjCoord = CoordinateConverter.WGSToYKJ(point.latitude, point.longitude);
+            squareName = myDbHelper.getSquareName(ykjCoord[0] / 10000, ykjCoord[1] / 10000);
+        } catch (Exception ex) {
+            //TODO
+            ex.printStackTrace();
+        } finally {
+            try {
+                myDbHelper.close();
+            } catch (Exception ex) {
+                //TODO
+                ex.printStackTrace();
+            }
+        }
+
         map.clear();
         locationMarker = map.addMarker(new MarkerOptions()
                 .position(point)
                 .anchor(0.5f, 0.5f)
+                .title(squareName)
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_show_species)));
-//        locationMarker.showInfoWindow();
+        locationMarker.showInfoWindow();
     }
 
     /**
@@ -225,7 +249,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         intent.putExtra(ARG_EAST_COORD, clickedPoint.longitude);
         intent.putExtra(FROM_MAP_VIEW, true);
         startActivity(intent);
-        return true;
+        return false;
     }
 
     /**

@@ -11,6 +11,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -61,6 +62,7 @@ import fi.jyu.ln.luontonurkka.tools.DatabaseHelper;
 public class TabbedListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<LocationSettingsResult>, com.google.android.gms.location.LocationListener {
 
     private static SpeciesLists speciesInSquare;
+    private static String squareName;
     private static final int LIST_LENGTH = 30;
     private int[] lastLocationYKJ = {0, 0};
     private GoogleApiClient apiClient;
@@ -127,13 +129,21 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         //if list view was opened from map activity
         openedFromMapView = intent.getBooleanExtra(MapsActivity.FROM_MAP_VIEW, false);
         if (openedFromMapView) {
+            //set my location button visible and map button invisible
+            ((FloatingActionButton) findViewById(R.id.ic_my_location)).setVisibility(View.VISIBLE);
+            ((FloatingActionButton) findViewById(R.id.ic_map)).setVisibility(View.INVISIBLE);
             //if came to list view from map view, don't update location
             requestingLocationUpdates = false;
+
+            //update list based on coordinates from map view
             lastLocationYKJ = CoordinateConverter.WGSToYKJ(intent.getDoubleExtra(MapsActivity.ARG_NORTH_COORD, 62.2141), intent.getDoubleExtra(MapsActivity.ARG_EAST_COORD, 25.7126));
             //TODO Decide on default coordinates
             speciesInSquare = getSpeciesList(intent.getDoubleExtra(MapsActivity.ARG_NORTH_COORD, 62.2141), intent.getDoubleExtra(MapsActivity.ARG_EAST_COORD, 25.7126));
         } else {
             requestingLocationUpdates = true;
+            //set my location button invisible and map button visible
+            ((FloatingActionButton) findViewById(R.id.ic_map)).setVisibility(View.VISIBLE);
+            ((FloatingActionButton) findViewById(R.id.ic_my_location)).setVisibility(View.INVISIBLE);
         }
 
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -142,6 +152,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         // primary sections of the activity.
         if (speciesInSquare != null) {
             mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+            ((TextView) findViewById(R.id.square_name)).setText(squareName);
         }
 
         // Set up the ViewPager with the sections adapter.
@@ -370,6 +381,25 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
      */
     protected void onMapButtonClick(View view) {
         openMapView();
+    }
+
+    /**
+     * Clicking on the my location button starts the location updates.
+     */
+    protected void onMyLocationButtonClick(View view) {
+        //set my location button invisible and map button visible
+        ((FloatingActionButton) findViewById(R.id.ic_map)).setVisibility(View.VISIBLE);
+        ((FloatingActionButton) findViewById(R.id.ic_my_location)).setVisibility(View.INVISIBLE);
+
+        final TabbedListActivity activity = this;
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                initializeLocation(activity);
+                findViewById(R.id.list_loading).setVisibility(View.VISIBLE);
+            }
+        };
+        thread.run();
     }
 
     /**
@@ -719,35 +749,8 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         Thread thread = new Thread() {
             @Override
             public void run() {
-                //If list view was not opened from map view, ask user to grant permission to use location and check location settings and start updating location
                 if (!openedFromMapView) {
-                    if (lastLocation == null) {
-                        // Ask user for permission to use coarse location
-                        Log.i(activity.getLocalClassName(), "Check the permission to use location.");
-                        if (ContextCompat.checkSelfPermission(activity.getApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                            Log.i(activity.getLocalClassName(), "Request a permission to use location.");
-                            ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSION_ACCESS_COARSE_LOCATION);
-                        } else {
-                            Log.i(activity.getLocalClassName(), "Permission to use location already granted.");
-                            //check location settings
-                            checkLocationSettings();
-
-                            // Get last location
-                            lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
-                            UpdateListTask task = new UpdateListTask();
-                            task.execute(new Void[0]);
-
-                            // Start location updates
-                            if (requestingLocationUpdates) {
-                                startLocationUpdates();
-                            }
-                        }
-                    } else {
-                        // Start location updates
-                        if (requestingLocationUpdates) {
-                            startLocationUpdates();
-                        }
-                    }
+                    initializeLocation(activity);
                 } else {
                     // cant set invisible if animation is set
                     View view = findViewById(R.id.list_loading);
@@ -760,6 +763,37 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             }
         };
         thread.run();
+    }
+
+    public void initializeLocation(Activity activity) {
+        //If list view was not opened from map view, ask user to grant permission to use location and check location settings and start updating location
+            if (lastLocation == null) {
+                // Ask user for permission to use coarse location
+                Log.i(activity.getLocalClassName(), "Check the permission to use location.");
+                if (ContextCompat.checkSelfPermission(activity.getApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    Log.i(activity.getLocalClassName(), "Request a permission to use location.");
+                    ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSION_ACCESS_COARSE_LOCATION);
+                } else {
+                    Log.i(activity.getLocalClassName(), "Permission to use location already granted.");
+                    //check location settings
+                    checkLocationSettings();
+
+                    // Get last location
+                    lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
+                    UpdateListTask task = new UpdateListTask();
+                    task.execute(new Void[0]);
+
+                    // Start location updates
+                    if (requestingLocationUpdates) {
+                        startLocationUpdates();
+                    }
+                }
+            } else {
+                // Start location updates
+                if (requestingLocationUpdates) {
+                    startLocationUpdates();
+                }
+            }
     }
 
     /**
@@ -875,6 +909,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                                 view.setAnimation(null);
                             }
                             view.setVisibility(View.INVISIBLE);
+
                         }
                     });
                     lastLocationYKJ = ykj;
@@ -900,6 +935,9 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             //fetch list from database according to YKJ coordinates
             int[] ykjCoord = CoordinateConverter.WGSToYKJ(n, e);
             speciesInSquare = myDbHelper.getSpeciesInSquare(ykjCoord[0] / 10000, ykjCoord[1] / 10000);
+
+            //fetch the name of the square
+            squareName = myDbHelper.getSquareName(ykjCoord[0] / 10000, ykjCoord[1] / 10000);
         } catch (Exception ex) {
             //TODO
             ex.printStackTrace();
