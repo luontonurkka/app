@@ -314,6 +314,25 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                 } else if (species.getType() == Species.PLANT) {
                     icon.setImageResource(R.drawable.ic_leaf);
                 }
+                int f = Math.round(species.getFreq() / 25f);
+                ImageView freq = (ImageView) row.findViewById(R.id.list_freq);
+                switch (f) {
+                    case 1:
+                        freq.setImageResource(R.drawable.freq_1);
+                        break;
+                    case 2:
+                        freq.setImageResource(R.drawable.freq_2);
+                        break;
+                    case 3:
+                        freq.setImageResource(R.drawable.freq_3);
+                        break;
+                    case 4:
+                        freq.setImageResource(R.drawable.freq_4);
+                        break;
+                    default:
+                        freq.setImageResource(R.drawable.freq_0);
+                        break;
+                }
                 return row;
             }
         }
@@ -758,7 +777,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                         view.getAnimation().cancel();
                         view.setAnimation(null);
                     }
-                    view.setVisibility(View.INVISIBLE);
+                    view.setVisibility(View.GONE);
                 }
             }
         };
@@ -908,7 +927,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                                 view.getAnimation().cancel();
                                 view.setAnimation(null);
                             }
-                            view.setVisibility(View.INVISIBLE);
+                            view.setVisibility(View.GONE);
 
                         }
                     });
