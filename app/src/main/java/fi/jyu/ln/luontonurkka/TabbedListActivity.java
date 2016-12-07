@@ -54,6 +54,8 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -385,7 +387,9 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             } else if (position == 2) {
                 return ListFragment.newInstance(position, speciesInSquare.getPlants());
             } else {
-                return ListFragment.newInstance(position, speciesInSquare.getAll());
+                ArrayList<Species> all = (ArrayList)speciesInSquare.getAll();
+                Collections.shuffle(all);
+                return ListFragment.newInstance(position, all);
             }
         }
 
