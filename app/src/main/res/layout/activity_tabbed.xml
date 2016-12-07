@@ -32,8 +32,8 @@
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimary"
                 android:maxLines="1"
-                android:layout_margin="@dimen/text_margin_half"
-                android:textSize="25sp"/>
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
