@@ -117,6 +117,7 @@ public class SpeciesActivity extends AppCompatActivity {
         findViewById(R.id.species_maximize_img).setVisibility(View.VISIBLE);
         Log.d(getClass().toString(), findViewById(R.id.image_progress) == null ? "null" : "not null");
         ((ProgressBar)findViewById(R.id.image_progress)).setVisibility(View.INVISIBLE);
+        findViewById(R.id.species_img_gradient).setVisibility(View.VISIBLE);
     }
 
     private void setFrequencyVisible(Species s) {

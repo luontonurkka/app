@@ -30,6 +30,8 @@
                 android:onClick="openImage"/>
 
             <ImageView
+                android:id="@+id/species_img_gradient"
+                android:visibility="invisible"
                 android:layout_gravity="bottom"
                 android:src="@drawable/gradient_dark"
                 android:layout_width="match_parent"
