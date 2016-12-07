@@ -151,8 +151,10 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         if (speciesInSquare != null) {
-            mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+            //show square name
             ((TextView) findViewById(R.id.square_name)).setText(squareName);
+            Log.d(getLocalClassName(), "Changed square name to " + squareName);
+            mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         }
 
         // Set up the ViewPager with the sections adapter.
@@ -920,6 +922,10 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                         @Override
                         public void run() {
                             mViewPager.setAdapter(mSectionsPagerAdapter);
+
+                            //show square name
+                            ((TextView) findViewById(R.id.square_name)).setText(squareName);
+                            Log.d(getLocalClassName(), "Changed square name to " + squareName);
 
                             // cant set invisible if animation is set
                             View view = findViewById(R.id.list_loading);
