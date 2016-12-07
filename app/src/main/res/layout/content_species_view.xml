@@ -14,38 +14,53 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:visibility="invisible"
+        <RelativeLayout
             android:id="@+id/freq_layout"
-            android:layout_margin="@dimen/text_margin_half"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true">
-            <ImageView
-                android:layout_margin="5dp"
-                android:id="@+id/freq_1"
-                android:src="@drawable/circle_outline"
-                android:layout_width="30dp"
-                android:layout_height="30dp" />
-            <ImageView
-                android:layout_margin="5dp"
-                android:id="@+id/freq_2"
-                android:src="@drawable/circle_outline"
-                android:layout_width="30dp"
-                android:layout_height="30dp" />
-            <ImageView
-                android:layout_margin="5dp"
-                android:id="@+id/freq_3"
-                android:src="@drawable/circle_outline"
-                android:layout_width="30dp"
-                android:layout_height="30dp" />
-            <ImageView
-                android:layout_margin="5dp"
-                android:id="@+id/freq_4"
-                android:src="@drawable/circle_outline"
-                android:layout_width="30dp"
-                android:layout_height="30dp" />
-        </LinearLayout>
+            android:visibility="invisible"
+            android:layout_marginTop="@dimen/text_margin_half"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/inner_freq_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true">
+                <ImageView
+                    android:layout_margin="5dp"
+                    android:id="@+id/freq_1"
+                    android:src="@drawable/circle_outline"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp" />
+                <ImageView
+                    android:layout_margin="5dp"
+                    android:id="@+id/freq_2"
+                    android:src="@drawable/circle_outline"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp" />
+                <ImageView
+                    android:layout_margin="5dp"
+                    android:id="@+id/freq_3"
+                    android:src="@drawable/circle_outline"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp" />
+                <ImageView
+                    android:layout_margin="5dp"
+                    android:id="@+id/freq_4"
+                    android:src="@drawable/circle_outline"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_marginRight="@dimen/text_margin_half"
+                android:layout_toLeftOf="@+id/inner_freq_layout"
+                android:text="@string/frequency"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
 
         <TextView
             android:layout_below="@id/freq_layout"
