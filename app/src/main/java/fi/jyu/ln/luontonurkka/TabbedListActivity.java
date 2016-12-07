@@ -34,6 +34,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -198,12 +199,13 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
          * fragment.
          */
         private static final String ARG_SPECIES_LIST = "species_list";
+        private static final String ARG_ACTIVITY = "species_list";
 
         private ArrayList<Species> species;
 
-        public ListFragment() {
-
-        }
+        private int listLength = 1;
+        private ArrayList<Species> currentList;
+        private Activity activity;
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -224,65 +226,88 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
 
             final ViewGroup cont = container;
 
+            activity = getActivity();
+
             // listen to drag refresh events
             ((SwipeRefreshLayout)rootView).setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {
-                    // get new randomized list
-                    SpeciesListAdapter sla = new SpeciesListAdapter(cont.getContext(), getRandomized(species));
-
-                    ListView listView = (ListView) rootView.findViewById(R.id.species_list);
-                    listView.setAdapter(sla);
-                    ((SwipeRefreshLayout)rootView).setRefreshing(false);
+                    currentList = new ArrayList<Species>(LIST_LENGTH);
+                    listLength = 1;
+                    updateList(cont, rootView);
                 }
             });
 
             species = (ArrayList<Species>) getArguments().getSerializable(ARG_SPECIES_LIST);
-
-            SpeciesListAdapter sla = new SpeciesListAdapter(container.getContext(), getRandomized(species));
+            currentList = new ArrayList<Species>(LIST_LENGTH);
+            updateList(cont, rootView);
 
             ListView listView = (ListView) rootView.findViewById(R.id.species_list);
-            listView.setAdapter(sla);
+            listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+                }
+
+                @Override
+                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                    if(firstVisibleItem + visibleItemCount >= totalItemCount) {
+                        ((SwipeRefreshLayout)rootView).setRefreshing(true);
+                        listLength++;
+                        updateList(cont, rootView);
+                    }
+                }
+            });
 
             return rootView;
         }
 
-        // gets randomized sublist from species list
-        // species with higher frequency have higher change
-        // to be in the list
-        private ArrayList<Species> getRandomized(ArrayList<Species> list) {
-            // check that list is long enough
-            if(list.size() < LIST_LENGTH)
-                // if not return same list
-                return list;
-
-            // init random list
-            ArrayList<Species> randomized = new ArrayList<>(LIST_LENGTH);
-            Random random = new Random();
-            // get first random
-            int next = random.nextInt(list.size() * 100);
-            // init species
-            Species s;
-            // index
-            int i = 0;
-            // pick randomply until LIST_LENGTH species picked
-            while (randomized.size() < LIST_LENGTH) {
-                s = list.get(i);
-                // subtract species frequency from 'next'
-                // if 'next' is negative add 's' to list
-                next -= s.getFreq();
-                if (next < 0) {
-                    // do not add same twice
-                    if(!randomized.contains(s))
-                        randomized.add(s);
-                    next = random.nextInt(list.size() * 100);
+        private void updateListView(final View container, final View rootView) {
+            final SpeciesListAdapter sla = new SpeciesListAdapter(container.getContext(), currentList);
+            final ListView listView = (ListView) rootView.findViewById(R.id.species_list);
+            listView.smoothScrollBy(0,0);
+            final int pos = listView.getFirstVisiblePosition();
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    listView.setAdapter(sla);
+                    listView.setSelection(pos);
+                    ((SwipeRefreshLayout)rootView).setRefreshing(false);
                 }
-                // loop the list
-                i++;
-                if (i >= list.size())
-                    i = 0;
-            }
-            return randomized;
+            });
+        }
+
+        private void updateList(final View container, final View rootView) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    /*
+                    Random random = new Random();
+                    int next = random.nextInt(species.size() * 100);
+                    Species s;
+                    int i = 0;
+                    while (currentList.size() < LIST_LENGTH * listLength && currentList.size() < species.size()) {
+                        s = species.get(i);
+                        next -= s.getFreq();
+                        if (next < 0) {
+                            if(!currentList.contains(s))
+                                currentList.add(s);
+                            next = random.nextInt(species.size() * 100);
+                        }
+
+                        i++;
+                        if (i >= species.size())
+                            i = 0;
+                    }
+                    updateListView(container, rootView);
+                    */
+                    int i = currentList.size();
+                    while(currentList.size() < LIST_LENGTH * listLength && currentList.size() < species.size()) {
+                        currentList.add(species.get(i++));
+                    }
+                    updateListView(container, rootView);
+                }
+            }).start();
         }
 
         private class SpeciesListAdapter extends ArrayAdapter {
