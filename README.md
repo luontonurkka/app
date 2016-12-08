@@ -1,5 +1,10 @@
 #Luontonurkka
-This is the Android-app side of our TIEA207 Project course
+This is the Android-app side of our TIEA207 Project-course.
+Application loaded into a phone and it uses pre-loaded data, GPS and internet to show data about local birds and flora.
+There is also an option to look elsewhere on the map of Finland so to say in advance.
+User experience has been kept as simple and informatic as possible. 
+
+
 Code licensed under [MIT License](https://github.com/luontonurkka/app/blob/master/License) in the spirit of open software.
 Our datasources:
 
