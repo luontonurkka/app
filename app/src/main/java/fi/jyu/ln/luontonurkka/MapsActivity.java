@@ -42,7 +42,7 @@ import fi.jyu.ln.luontonurkka.tools.CoordinateConverter;
 import fi.jyu.ln.luontonurkka.tools.DatabaseHelper;
 import fi.jyu.ln.luontonurkka.tools.SettingsManager;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<LocationSettingsResult>, GoogleMap.OnMarkerClickListener {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<LocationSettingsResult> {
     private GoogleMap map;
     private Marker locationMarker;
     private GoogleApiClient apiClient;
@@ -189,7 +189,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(65.551806, 26.305592), 5));
         map.setOnMapClickListener(this);
         map.setOnInfoWindowClickListener(this);
-        map.setOnMarkerClickListener(this);
 
         Log.i(this.getLocalClassName(), "Check the permission to use location.");
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -216,7 +215,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         myDbHelper.initializeDataBase();
         String squareName = "";
         try {
-            //fetch list from database according to YKJ coordinates
             int[] ykjCoord = CoordinateConverter.WGSToYKJ(point.latitude, point.longitude);
             squareName = myDbHelper.getSquareName(ykjCoord[0] / 10000, ykjCoord[1] / 10000);
         } catch (Exception ex) {
@@ -231,13 +229,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
 
-        map.clear();
-        locationMarker = map.addMarker(new MarkerOptions()
-                .position(point)
-                .alpha(0.0f)
-                .anchor(0.5f, 0f)
-                .title(squareName));
-        locationMarker.showInfoWindow();
+        if (squareName != null && !(squareName.isEmpty())) {
+            map.clear();
+            locationMarker = map.addMarker(new MarkerOptions()
+                    .position(point)
+                    .alpha(0.0f)
+                    .anchor(0.5f, 0f)
+                    .title(squareName));
+            locationMarker.showInfoWindow();
+        }
     }
 
     /**
@@ -251,21 +251,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         intent.putExtra(ARG_EAST_COORD, clickedPoint.longitude);
         intent.putExtra(FROM_MAP_VIEW, true);
         startActivity(intent);
-    }
-
-    /**
-     * Called when user clicks marker
-     * @param marker Marker clicked
-     * @return Suppress the default behaviour (centering the map and opening an info window)
-     */
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-        Intent intent = new Intent(this, TabbedListActivity.class);
-        intent.putExtra(ARG_NORTH_COORD, clickedPoint.latitude);
-        intent.putExtra(ARG_EAST_COORD, clickedPoint.longitude);
-        intent.putExtra(FROM_MAP_VIEW, true);
-        startActivity(intent);
-        return false;
     }
 
     /**
