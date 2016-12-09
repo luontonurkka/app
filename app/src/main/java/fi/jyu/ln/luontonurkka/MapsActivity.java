@@ -40,6 +40,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import fi.jyu.ln.luontonurkka.tools.CoordinateConverter;
 import fi.jyu.ln.luontonurkka.tools.DatabaseHelper;
+import fi.jyu.ln.luontonurkka.tools.SettingsManager;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<LocationSettingsResult>, GoogleMap.OnMarkerClickListener {
     private GoogleMap map;
@@ -149,6 +150,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onPause();
         if (apiClient.isConnected()) {
             apiClient.disconnect();
+        }
+    }
+
+    /**
+     * Return back to list view
+     */
+    @Override
+    public void onBackPressed() {
+        SettingsManager sm = new SettingsManager(this);
+        if(!(sm.getBool(this.getString(R.string.setting_map_default)))) {
+            Intent intent = new Intent(this, TabbedListActivity.class);
+            startActivity(intent);
+        }
+        else {
+            super.onBackPressed();
         }
     }
 
