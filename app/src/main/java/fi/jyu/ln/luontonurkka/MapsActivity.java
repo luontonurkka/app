@@ -164,7 +164,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             startActivity(intent);
         }
         else {
-            super.onBackPressed();
+            finish();
         }
     }
 

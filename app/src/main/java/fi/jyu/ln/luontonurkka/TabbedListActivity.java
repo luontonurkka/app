@@ -456,8 +456,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
      * Opens the map view activity and finishes the current activity.
      */
     protected void openMapView() {
-        finish();
-        if (!(getIntent().getBooleanExtra(MapsActivity.FROM_MAP_VIEW, false))) {
+        if (!openedFromMapView) {
             Intent intent = new Intent(this, MapsActivity.class);
             startActivity(intent);
         }
@@ -509,6 +508,8 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+        } else if (openedFromMapView) {
+            finish();
         } else {
             super.onBackPressed();
         }
