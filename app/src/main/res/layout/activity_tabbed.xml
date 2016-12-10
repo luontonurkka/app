@@ -80,13 +80,13 @@
                 <ImageButton
                     android:id="@+id/search_button"
                     android:layout_alignParentRight="true"
-                    android:layout_marginTop="8dp"
                     android:layout_marginRight="@dimen/text_margin_half"
                     android:padding="10dp"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/ic_three_lines"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_search_white_48dp"
                     android:onClick="search"
+                    android:scaleType="centerInside"
                     style="?android:attr/borderlessButtonStyle"/>
 
             </RelativeLayout>
