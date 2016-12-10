@@ -26,7 +26,10 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,6 +40,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -54,10 +58,8 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import fi.jyu.ln.luontonurkka.tools.CoordinateConverter;
 import fi.jyu.ln.luontonurkka.tools.DatabaseHelper;
@@ -190,6 +192,23 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         Animation rotation = AnimationUtils.loadAnimation(this, R.anim.spinning);
         rotation.setRepeatCount(Animation.INFINITE);
         findViewById(R.id.list_loading).setAnimation(rotation);
+
+        ((EditText)findViewById(R.id.search_field)).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                search(s.toString().toLowerCase());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
     /**
@@ -209,6 +228,12 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         private ArrayList<Species> currentList;
         private Activity activity;
 
+        private ViewGroup container;
+        private View rootView;
+
+        private String lastSearch = "";
+        private boolean end = false;
+
         /**
          * Returns a new instance of this fragment for the given section
          * number.
@@ -222,11 +247,11 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+        public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                                  Bundle savedInstanceState) {
-            final View rootView = inflater.inflate(R.layout.activity_list, container, false);
+            rootView = inflater.inflate(R.layout.activity_list, container, false);
 
-            final ViewGroup cont = container;
+            this.container = container;
 
             activity = getActivity();
 
@@ -236,13 +261,15 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                 public void onRefresh() {
                     currentList = new ArrayList<Species>(LIST_LENGTH);
                     listLength = 1;
-                    updateList(cont, rootView);
+                    search(lastSearch);
+                    //updateList();
                 }
             });
 
             species = (ArrayList<Species>) getArguments().getSerializable(ARG_SPECIES_LIST);
             currentList = new ArrayList<Species>(LIST_LENGTH);
-            updateList(cont, rootView);
+            search("");
+            //updateList();
 
             final ListView listView = (ListView) rootView.findViewById(R.id.species_list);
             listView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -254,9 +281,12 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                 @Override
                 public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                     if(firstVisibleItem + visibleItemCount >= totalItemCount && LIST_LENGTH * listLength < species.size()) {
+                        /*
                         ((SwipeRefreshLayout)rootView).setRefreshing(true);
                         listLength++;
-                        updateList(cont, rootView);
+                        updateList();
+                        */
+                        search(lastSearch);
                     }
                 }
             });
@@ -264,7 +294,46 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             return rootView;
         }
 
-        private void updateListView(final View container, final View rootView) {
+        private void search(final String query) {
+            ((SwipeRefreshLayout)rootView).setRefreshing(true);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    if(query.equals(lastSearch)) {
+                        listLength++;
+                    } else {
+                        listLength = 1;
+                        currentList.clear();
+                    }
+
+                    ArrayList<Species> results = new ArrayList<Species>(15);
+                    for(Species s : species) {
+                        if(s.getName().toLowerCase().contains(query))
+                            results.add(s);
+                    }
+                    int i = 0;
+                    while(currentList.size() < results.size() && currentList.size() < listLength * LIST_LENGTH) {
+                        if(!currentList.contains(results.get(i)))
+                            currentList.add(results.get(i));
+                        i++;
+                    }
+                    lastSearch = query;
+
+                    if(i > 0) {
+                        updateListView();
+                    } else {
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ((SwipeRefreshLayout)rootView).setRefreshing(false);
+                            }
+                        });
+                    }
+                }
+            }).start();
+        }
+
+        private void updateListView() {
             final SpeciesListAdapter sla = new SpeciesListAdapter(container.getContext(), currentList);
             final ListView listView = (ListView) rootView.findViewById(R.id.species_list);
             listView.smoothScrollBy(0,0);
@@ -279,7 +348,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             });
         }
 
-        private void updateList(final View container, final View rootView) {
+        /*private void updateList() {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -302,15 +371,15 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                             i = 0;
                     }
                     updateListView(container, rootView);
-                    */
+                    *//*
                     int i = currentList.size();
                     while(currentList.size() < LIST_LENGTH * listLength && currentList.size() < species.size()) {
                         currentList.add(species.get(i++));
                     }
-                    updateListView(container, rootView);
+                    updateListView();
                 }
             }).start();
-        }
+        }*/
 
         private class SpeciesListAdapter extends ArrayAdapter {
 
@@ -382,15 +451,17 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             // getItem is called to instantiate the fragment for the given page.
             // Return a ListFragment (defined as a static inner class below).
 
+            ListFragment lf;
             if (position == 1) {
-                return ListFragment.newInstance(position, speciesInSquare.getBirds());
+                lf = ListFragment.newInstance(position, speciesInSquare.getBirds());
             } else if (position == 2) {
-                return ListFragment.newInstance(position, speciesInSquare.getPlants());
+                lf = ListFragment.newInstance(position, speciesInSquare.getPlants());
             } else {
                 ArrayList<Species> all = (ArrayList)speciesInSquare.getAll();
                 Collections.shuffle(all);
-                return ListFragment.newInstance(position, all);
+                lf = ListFragment.newInstance(position, all);
             }
+            return lf;
         }
 
         @Override
@@ -474,6 +545,27 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (!drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.openDrawer(GravityCompat.START);
+        }
+    }
+
+    public void search(String query) {
+        List<Fragment> frgs = getSupportFragmentManager().getFragments();
+        for(Fragment f : frgs) {
+            try {
+                ((ListFragment)f).search(query);
+            } catch (ClassCastException e) {
+                Log.e(getClass().toString(), e.getMessage());
+            }
+        }
+    }
+
+    public void search(View view) {
+        EditText searchField = (EditText)findViewById(R.id.search_field);
+
+        if(searchField.getVisibility() != View.VISIBLE) {
+            searchField.setVisibility(View.VISIBLE);
+        } else {
+            searchField.setVisibility(View.GONE);
         }
     }
 
