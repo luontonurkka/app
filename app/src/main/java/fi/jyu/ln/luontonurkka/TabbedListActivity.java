@@ -244,7 +244,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             currentList = new ArrayList<Species>(LIST_LENGTH);
             updateList(cont, rootView);
 
-            ListView listView = (ListView) rootView.findViewById(R.id.species_list);
+            final ListView listView = (ListView) rootView.findViewById(R.id.species_list);
             listView.setOnScrollListener(new AbsListView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -253,7 +253,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
 
                 @Override
                 public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                    if(firstVisibleItem + visibleItemCount >= totalItemCount) {
+                    if(firstVisibleItem + visibleItemCount >= totalItemCount && LIST_LENGTH * listLength < species.size()) {
                         ((SwipeRefreshLayout)rootView).setRefreshing(true);
                         listLength++;
                         updateList(cont, rootView);
@@ -446,6 +446,9 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             @Override
             public void run() {
                 initializeLocation(activity);
+                Animation rotation = AnimationUtils.loadAnimation(activity, R.anim.spinning);
+                rotation.setRepeatCount(Animation.INFINITE);
+                findViewById(R.id.list_loading).setAnimation(rotation);
                 findViewById(R.id.list_loading).setVisibility(View.VISIBLE);
             }
         };
