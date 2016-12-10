@@ -77,7 +77,31 @@
                         style="?android:attr/borderlessButtonStyle"/>
                 </LinearLayout>
 
+                <ImageButton
+                    android:id="@+id/search_button"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginRight="@dimen/text_margin_half"
+                    android:padding="10dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_three_lines"
+                    android:onClick="search"
+                    style="?android:attr/borderlessButtonStyle"/>
+
             </RelativeLayout>
+
+            <EditText
+                android:id="@+id/search_field"
+                android:textColor="#FF000000"
+                android:padding="@dimen/text_margin_half"
+                android:layout_marginTop="1dp"
+                android:layout_marginBottom="1dp"
+                android:background="#FFFFFFFF"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/search_hint"
+                android:visibility="gone" />
 
         </android.support.design.widget.AppBarLayout>
 
