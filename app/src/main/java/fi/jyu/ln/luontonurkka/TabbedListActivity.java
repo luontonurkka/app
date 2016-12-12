@@ -501,6 +501,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
      * Clicking on the map button opens the map view.
      */
     protected void onMapButtonClick(View view) {
+        finish();
         openMapView();
     }
 
