@@ -91,23 +91,40 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:src="@drawable/ic_search_white_48dp"
-                    android:onClick="search"
+                    android:onClick="onSearchButtonClick"
                     android:scaleType="centerInside"
                     style="?android:attr/borderlessButtonStyle"/>
 
             </RelativeLayout>
 
-            <EditText
-                android:id="@+id/search_field"
-                android:textColor="#FF000000"
-                android:padding="@dimen/text_margin_half"
-                android:layout_marginTop="1dp"
-                android:layout_marginBottom="1dp"
-                android:background="#FFFFFFFF"
+            <FrameLayout
+                android:id="@+id/search_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/search_hint"
-                android:visibility="gone" />
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/search_field"
+                    android:textColor="#FF000000"
+                    android:padding="@dimen/text_margin_half"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginBottom="1dp"
+                    android:background="#FFFFFFFF"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/search_hint"/>
+
+                <ImageButton
+                    android:id="@+id/clear_search"
+                    android:padding="10dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="right|center_vertical"
+                    android:src="@drawable/ic_clear"
+                    android:background="#00000000"
+                    android:onClick="onClearSearchClick"/>
+
+            </FrameLayout>
 
         </android.support.design.widget.AppBarLayout>
 

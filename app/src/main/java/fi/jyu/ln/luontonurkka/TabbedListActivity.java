@@ -42,6 +42,7 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -491,12 +492,13 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
      * @param species Species object on which more info will be shown
      */
     protected void openSpeciesView(Species species) {
-        //if search field is visible, set it unvisible
-        EditText searchField = (EditText)findViewById(R.id.search_field);
-        searchField.setVisibility(View.GONE);
+        //if search field is visible, set it unvisible and hide keyboard
+        View searchLayout = findViewById(R.id.search_layout);
+        if(searchLayout.getVisibility() == View.VISIBLE) {
+            searchLayout.setVisibility(View.GONE);
+        }
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if (inputMethodManager != null) {
-//                inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
             inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
         }
 
@@ -569,23 +571,22 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         }
     }
 
-    public void search(View view) {
+    public void onSearchButtonClick(View view) {
         EditText searchField = (EditText)findViewById(R.id.search_field);
+        View searchLayout = findViewById(R.id.search_layout);
 
-        if(searchField.getVisibility() != View.VISIBLE) {
-            searchField.setVisibility(View.VISIBLE);
+        if(searchLayout.getVisibility() != View.VISIBLE) {
+            searchLayout.setVisibility(View.VISIBLE);
             if (searchField.requestFocus()) {
                 InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (inputMethodManager != null) {
-//                    inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                     inputMethodManager.showSoftInput(searchField, 0);
                 }
             }
         } else {
-            searchField.setVisibility(View.GONE);
+            searchLayout.setVisibility(View.GONE);
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             if (inputMethodManager != null) {
-//                inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                 inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
             }
         }
