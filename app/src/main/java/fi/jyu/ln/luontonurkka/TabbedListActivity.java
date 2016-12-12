@@ -528,7 +528,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
     }
 
     /**
-     * Opens the map view activity and finishes the current activity.
+     * Opens the map view activity.
      */
     protected void openMapView() {
         if (!openedFromMapView) {

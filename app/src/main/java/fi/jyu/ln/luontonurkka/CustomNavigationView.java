@@ -29,18 +29,18 @@ public class CustomNavigationView extends NavigationView {
         if(!isInEditMode()) {
             sm = new SettingsManager((Activity) context);
 
-            final String nightSettingsString = context.getString(R.string.setting_night_theme);
-            Switch nightSwitch = (Switch) headerView.findViewById(R.id.switch_night);
-            boolean nightTheme = sm.getBool(nightSettingsString);
-            if (nightTheme) {
-                nightSwitch.toggle();
-            }
-            nightSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    sm.setBool(nightSettingsString, isChecked);
-                }
-            });
+//            final String nightSettingsString = context.getString(R.string.setting_night_theme);
+//            Switch nightSwitch = (Switch) headerView.findViewById(R.id.switch_night);
+//            boolean nightTheme = sm.getBool(nightSettingsString);
+//            if (nightTheme) {
+//                nightSwitch.toggle();
+//            }
+//            nightSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//                @Override
+//                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                    sm.setBool(nightSettingsString, isChecked);
+//                }
+//            });
 
             final String mapSettingsString = context.getString(R.string.setting_map_default);
             Switch mapSwitch = (Switch) headerView.findViewById(R.id.switch_map);
