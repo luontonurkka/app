@@ -30,31 +30,32 @@
                     android:layout_margin="5dp"
                     android:id="@+id/freq_1"
                     android:src="@drawable/circle_outline"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp" />
+                    android:layout_width="@dimen/species_freq_indicator_size"
+                    android:layout_height="@dimen/species_freq_indicator_size" />
                 <ImageView
                     android:layout_margin="5dp"
                     android:id="@+id/freq_2"
                     android:src="@drawable/circle_outline"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp" />
+                    android:layout_width="@dimen/species_freq_indicator_size"
+                    android:layout_height="@dimen/species_freq_indicator_size" />
                 <ImageView
                     android:layout_margin="5dp"
                     android:id="@+id/freq_3"
                     android:src="@drawable/circle_outline"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp" />
+                    android:layout_width="@dimen/species_freq_indicator_size"
+                    android:layout_height="@dimen/species_freq_indicator_size" />
                 <ImageView
                     android:layout_margin="5dp"
                     android:id="@+id/freq_4"
                     android:src="@drawable/circle_outline"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp" />
+                    android:layout_width="@dimen/species_freq_indicator_size"
+                    android:layout_height="@dimen/species_freq_indicator_size" />
             </LinearLayout>
 
             <TextView
                 android:layout_marginRight="@dimen/text_margin_half"
                 android:layout_toLeftOf="@+id/inner_freq_layout"
+                android:textSize="@dimen/species_desc_text_size"
                 android:text="@string/frequency"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -69,14 +70,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/text_margin_half"
-            android:text="@string/species_desc" />
+            android:text="@string/species_desc"
+            android:textSize="@dimen/species_desc_text_size"/>
 
         <Button
             android:layout_below="@id/species_content_text"
             android:visibility="invisible"
+            android:padding="@dimen/wiki_button_padding"
             android:layout_margin="@dimen/text_margin_half"
             android:layout_marginTop="0dp"
             android:text="@string/read_more_wiki"
+            android:textSize="@dimen/species_desc_text_size"
             android:id="@+id/species_content_button_wiki"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -33,7 +33,7 @@
                 android:background="@color/colorPrimary"
                 android:maxLines="1"
                 android:layout_margin="5dp"
-                android:textSize="20sp"/>
+                android:textSize="@dimen/square_name_font_size"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -54,14 +54,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
                     <Button
+                        android:padding="@dimen/tab_padding"
                         android:id="@+id/tab_all"
                         android:background="@drawable/rect"
+                        android:textSize="@dimen/tab_text_size"
                         android:text="@string/tab_all"
                         android:onClick="showAllTab"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="?android:attr/borderlessButtonStyle"/>
                     <Button
+                        android:padding="@dimen/tab_padding"
+                        android:textSize="@dimen/tab_text_size"
                         android:id="@+id/tab_birds"
                         android:text="@string/tab_birds"
                         android:onClick="showBirdsTab"
@@ -69,7 +73,9 @@
                         android:layout_height="wrap_content"
                         style="?android:attr/borderlessButtonStyle"/>
                     <Button
+                        android:padding="@dimen/tab_padding"
                         android:id="@+id/tab_plants"
+                        android:textSize="@dimen/tab_text_size"
                         android:text="@string/tab_plants"
                         android:onClick="showPlantsTab"
                         android:layout_width="wrap_content"
@@ -138,9 +144,9 @@
             android:id="@+id/ic_map"
             android:src="@drawable/ic_map"
             app:fabSize="normal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_width="@dimen/fab_size"
+            android:layout_height="@dimen/fab_size"
+            android:layout_margin="@dimen/fab_margin"
             app:layout_anchor="@id/list_pager"
             app:layout_anchorGravity="bottom|right|end"
             android:onClick="onMapButtonClick"
@@ -150,9 +156,9 @@
             android:id="@+id/ic_my_location"
             android:src="@drawable/ic_my_location"
             app:fabSize="normal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_width="@dimen/fab_size"
+            android:layout_height="@dimen/fab_size"
+            android:layout_margin="@dimen/fab_margin"
             app:layout_anchor="@id/list_pager"
             app:layout_anchorGravity="bottom|right|end"
             android:onClick="onMyLocationButtonClick"

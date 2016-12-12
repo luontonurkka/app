@@ -1,0 +1,20 @@
+<resources>
+    <dimen name="fab_size">100dp</dimen>
+    <dimen name="fab_margin">24dp</dimen>
+
+    <dimen name="text_margin">24dp</dimen>
+    <dimen name="text_margin_half">12dp</dimen>
+
+    <dimen name="list_text_size">30sp</dimen>
+    <dimen name="list_icon_size">64dp</dimen>
+    <dimen name="list_freq_size">30dp</dimen>
+
+    <dimen name="square_name_font_size">30sp</dimen>
+    <dimen name="tab_text_size">24sp</dimen>
+    <dimen name="tab_padding">16dp</dimen>
+
+    <dimen name="species_toolbar_height">300dp</dimen>
+    <dimen name="species_desc_text_size">24sp</dimen>
+    <dimen name="species_freq_indicator_size">45dp</dimen>
+    <dimen name="wiki_button_padding">30dp</dimen>
+</resources>
