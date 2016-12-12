@@ -12,4 +12,9 @@
     <dimen name="square_name_font_size">30sp</dimen>
     <dimen name="tab_text_size">24sp</dimen>
     <dimen name="tab_padding">16dp</dimen>
+
+    <dimen name="species_toolbar_height">300dp</dimen>
+    <dimen name="species_desc_text_size">24sp</dimen>
+    <dimen name="species_freq_indicator_size">45dp</dimen>
+    <dimen name="wiki_button_padding">30dp</dimen>
 </resources>
