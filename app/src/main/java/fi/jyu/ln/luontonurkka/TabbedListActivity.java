@@ -592,6 +592,12 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         }
     }
 
+
+    public void onClearSearchClick(View view) {
+        EditText searchField = (EditText)findViewById(R.id.search_field);
+        searchField.setText("");
+    }
+
     public void showAllTab(View view) {
         showTab(0);
     }
