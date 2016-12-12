@@ -37,6 +37,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -490,6 +491,14 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
      * @param species Species object on which more info will be shown
      */
     protected void openSpeciesView(Species species) {
+        //if search field is visible, set it unvisible
+        EditText searchField = (EditText)findViewById(R.id.search_field);
+        searchField.setVisibility(View.GONE);
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (inputMethodManager != null) {
+//                inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+            inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
+        }
 
         Intent intent = new Intent(this, SpeciesActivity.class);
         intent.putExtra("Species", species);
@@ -565,8 +574,20 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
 
         if(searchField.getVisibility() != View.VISIBLE) {
             searchField.setVisibility(View.VISIBLE);
+            if (searchField.requestFocus()) {
+                InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (inputMethodManager != null) {
+//                    inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                    inputMethodManager.showSoftInput(searchField, 0);
+                }
+            }
         } else {
             searchField.setVisibility(View.GONE);
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (inputMethodManager != null) {
+//                inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
         }
     }
 
