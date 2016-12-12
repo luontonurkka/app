@@ -1,12 +1,16 @@
 package fi.jyu.ln.luontonurkka;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -15,6 +19,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import fi.jyu.ln.luontonurkka.tools.DownloadImageTask;
 import fi.jyu.ln.luontonurkka.tools.OnTaskCompleted;
@@ -54,7 +59,6 @@ public class SpeciesActivity extends AppCompatActivity {
         layout.setExpandedTitleColor(Color.WHITE);
         layout.setCollapsedTitleTextColor(Color.WHITE);
 
-        // TODO ids wrongway around
         pageId = species.getIdEng();
         lang = "fi";
         if (pageId.length() < 1) {
@@ -62,25 +66,34 @@ public class SpeciesActivity extends AppCompatActivity {
             lang = "en";
         }
 
-        OnTaskCompleted task = new OnTaskCompleted() {
-            @Override
-            public void onTaskCompleted(String result) {
-                if (result != null)
-                    setTextComplete(result);
-            }
-
-            @Override
-            public void onTaskCompleted(Bitmap result) {
-                if (result != null)
-                    setImgComplete(result);
-            }
-        };
-        WikiFetcher.getWikiDescription(pageId, task, lang);
-
-        if (species.getImgUrl().length() > 0) {
-            new DownloadImageTask(task).execute(species.getImgUrl());
+        if (!isNetworkAvailable()) {
+            (findViewById(R.id.image_progress)).setVisibility(View.INVISIBLE);
+            (findViewById(R.id.species_loading)).setVisibility(View.INVISIBLE);
+            setFrequencyVisible(species);
+            Snackbar.make(findViewById(android.R.id.content), "Yhdistä laite internetiin nähdäksesi lajitiedot.", Snackbar.LENGTH_INDEFINITE)
+                    .show();
         } else {
-            ((ProgressBar) findViewById(R.id.image_progress)).setVisibility(View.INVISIBLE);
+
+            OnTaskCompleted task = new OnTaskCompleted() {
+                @Override
+                public void onTaskCompleted(String result) {
+                    if (result != null)
+                        setTextComplete(result);
+                }
+
+                @Override
+                public void onTaskCompleted(Bitmap result) {
+                    if (result != null)
+                        setImgComplete(result);
+                }
+            };
+            WikiFetcher.getWikiDescription(pageId, task, lang);
+
+            if (species.getImgUrl().length() > 0) {
+                new DownloadImageTask(task).execute(species.getImgUrl());
+            } else {
+                ((ProgressBar) findViewById(R.id.image_progress)).setVisibility(View.INVISIBLE);
+            }
         }
     }
 
@@ -153,4 +166,16 @@ public class SpeciesActivity extends AppCompatActivity {
         else
             super.onBackPressed();
     }
+
+    /**
+     * Checks if network is available.
+     * @return Is network available
+     */
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
 }
