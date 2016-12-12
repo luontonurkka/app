@@ -20,15 +20,15 @@
         <ImageView
             android:paddingTop="3dp"
             android:layout_marginLeft="@dimen/text_margin_half"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
+            android:layout_width="@dimen/list_icon_size"
+            android:layout_height="@dimen/list_icon_size"
             android:id="@+id/list_image" />
 
         <TextView
             android:layout_marginLeft="@dimen/text_margin_half"
             android:layout_marginRight="@dimen/text_margin_half"
             android:id="@+id/list_name"
-            android:textSize="20dp"
+            android:textSize="@dimen/list_text_size"
             android:text="..."
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
@@ -39,8 +39,8 @@
             android:id="@+id/list_freq"
             android:layout_marginRight="@dimen/text_margin_half"
             android:src="@drawable/freq_0"
-            android:layout_width="20dp"
-            android:layout_height="20dp" />
+            android:layout_width="@dimen/list_freq_size"
+            android:layout_height="@dimen/list_freq_size" />
 
     </LinearLayout>
 
