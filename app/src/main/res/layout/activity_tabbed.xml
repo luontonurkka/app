@@ -43,8 +43,8 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginLeft="@dimen/text_margin_half"
                     android:padding="10dp"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    android:layout_width="@dimen/menu_icon_size"
+                    android:layout_height="@dimen/menu_icon_size"
                     android:src="@drawable/ic_three_lines"
                     android:onClick="showDrawer"
                     style="?android:attr/borderlessButtonStyle"/>
