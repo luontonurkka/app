@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -14,6 +16,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -25,6 +28,7 @@ import fi.jyu.ln.luontonurkka.tools.DownloadImageTask;
 import fi.jyu.ln.luontonurkka.tools.OnTaskCompleted;
 import fi.jyu.ln.luontonurkka.tools.WikiFetcher;
 
+import static fi.jyu.ln.luontonurkka.R.id.android_pay;
 import static fi.jyu.ln.luontonurkka.R.id.species_toolbar_layout;
 
 /**
@@ -49,6 +53,13 @@ public class SpeciesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_species_view);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        final Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_material);
+        upArrow.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+        getSupportActionBar().setHomeAsUpIndicator(upArrow);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         // get species from intent
         species = (Species) getIntent().getSerializableExtra("Species");
@@ -165,6 +176,15 @@ public class SpeciesActivity extends AppCompatActivity {
             closeImage(null);
         else
             super.onBackPressed();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home) {
+            finish();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     /**
