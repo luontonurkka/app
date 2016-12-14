@@ -185,6 +185,10 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                     else
                         bts[i].setBackground(null);
                 }
+
+                String searchString = ((TextView)findViewById(R.id.search_field)).getText().toString();
+                if(searchString.length() > 0)
+                    search(searchString);
             }
 
             @Override
@@ -264,14 +268,12 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                     currentList = new ArrayList<Species>(LIST_LENGTH);
                     listLength = 1;
                     search(lastSearch);
-                    //updateList();
                 }
             });
 
             species = (ArrayList<Species>) getArguments().getSerializable(ARG_SPECIES_LIST);
             currentList = new ArrayList<Species>(LIST_LENGTH);
             search("");
-            //updateList();
 
             final ListView listView = (ListView) rootView.findViewById(R.id.species_list);
             listView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -283,11 +285,6 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                 @Override
                 public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                     if(firstVisibleItem + visibleItemCount >= totalItemCount && LIST_LENGTH * listLength < species.size()) {
-                        /*
-                        ((SwipeRefreshLayout)rootView).setRefreshing(true);
-                        listLength++;
-                        updateList();
-                        */
                         search(lastSearch);
                     }
                 }
@@ -301,11 +298,14 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    ArrayList<Species> newList = new ArrayList<Species>();
                     if(query.equals(lastSearch)) {
                         listLength++;
+                        newList.addAll(currentList);
                     } else {
                         listLength = 1;
-                        currentList.clear();
+                        //currentList = new ArrayList<Species>();
+                        //currentList.clear();
                     }
 
                     ArrayList<Species> results = new ArrayList<Species>(15);
@@ -314,14 +314,14 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                             results.add(s);
                     }
                     int i = 0;
-                    while(currentList.size() < results.size() && currentList.size() < listLength * LIST_LENGTH) {
-                        if(!currentList.contains(results.get(i)))
-                            currentList.add(results.get(i));
+                    while(newList.size() < results.size() && newList.size() < listLength * LIST_LENGTH) {
+                        if(!newList.contains(results.get(i)))
+                            newList.add(results.get(i));
                         i++;
                     }
-                    lastSearch = query;
+                    currentList = newList;
 
-                    if(i > 0) {
+                    if(i > 0 || !lastSearch.equals(query)) {
                         updateListView();
                     } else {
                         activity.runOnUiThread(new Runnable() {
@@ -331,6 +331,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
                             }
                         });
                     }
+                    lastSearch = query;
                 }
             }).start();
         }
@@ -350,53 +351,19 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             });
         }
 
-        /*private void updateList() {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    /*
-                    Random random = new Random();
-                    int next = random.nextInt(species.size() * 100);
-                    Species s;
-                    int i = 0;
-                    while (currentList.size() < LIST_LENGTH * listLength && currentList.size() < species.size()) {
-                        s = species.get(i);
-                        next -= s.getFreq();
-                        if (next < 0) {
-                            if(!currentList.contains(s))
-                                currentList.add(s);
-                            next = random.nextInt(species.size() * 100);
-                        }
-
-                        i++;
-                        if (i >= species.size())
-                            i = 0;
-                    }
-                    updateListView(container, rootView);
-                    *//*
-                    int i = currentList.size();
-                    while(currentList.size() < LIST_LENGTH * listLength && currentList.size() < species.size()) {
-                        currentList.add(species.get(i++));
-                    }
-                    updateListView();
-                }
-            }).start();
-        }*/
-
         private class SpeciesListAdapter extends ArrayAdapter {
 
-            ArrayList<Species> speciesList;
-            Context context;
+            //Context context;
 
             public SpeciesListAdapter(Context context, ArrayList<Species> speciesList) {
                 super(context, R.layout.specieslistobject_layout, speciesList);
-                this.speciesList = speciesList;
-                this.context = context;
+                //this.context = context;
             }
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 final Species species = (Species) getItem(position);
+                Context context = parent.getContext();
                 LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
                 final View row = inflater.inflate(R.layout.specieslistobject_layout, null, true);
                 TextView textView = (TextView) row.findViewById(R.id.list_name);
@@ -611,6 +578,8 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
     }
 
     public void showTab(int index) {
+
+
         // change button bg to show white line
         // to indicate selected tab
         Button[] bts = {(Button) findViewById(R.id.tab_all),
@@ -625,6 +594,10 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         }
         ViewPager pager = (ViewPager) findViewById(R.id.list_pager);
         pager.setCurrentItem(index);
+
+        String searchString = ((TextView)findViewById(R.id.search_field)).getText().toString();
+        if(searchString.length() > 0)
+            search(searchString);
     }
 
     @Override
