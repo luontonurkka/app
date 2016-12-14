@@ -556,6 +556,7 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
             if (inputMethodManager != null) {
                 inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
             }
+            searchField.setText("");
         }
     }
 
