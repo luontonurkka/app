@@ -130,6 +130,15 @@ public class TabbedListActivity extends AppCompatActivity implements NavigationV
         createLocationRequest();
         buildLocationSettingsRequest();
 
+        //Open map when clicking square name
+        findViewById(R.id.square_name).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                openMapView();
+            }
+        });
+
         //get intent
         Intent intent = getIntent();
 
