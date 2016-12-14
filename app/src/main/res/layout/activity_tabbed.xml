@@ -116,11 +116,11 @@
 
                 <ImageButton
                     android:id="@+id/clear_search"
-                    android:padding="10dp"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    android:layout_width="@dimen/clear_icon_size"
+                    android:layout_height="@dimen/clear_icon_size"
                     android:layout_gravity="right|center_vertical"
                     android:src="@drawable/ic_clear"
+                    android:scaleType="centerInside"
                     android:background="#00000000"
                     android:onClick="onClearSearchClick"/>
 

@@ -14,6 +14,7 @@
     <dimen name="tab_padding">16dp</dimen>
     <dimen name="menu_icon_size">48dp</dimen>
     <dimen name="search_icon_size">64dp</dimen>
+    <dimen name="clear_icon_size">56dp</dimen>
 
     <dimen name="species_toolbar_height">300dp</dimen>
     <dimen name="species_desc_text_size">24sp</dimen>
